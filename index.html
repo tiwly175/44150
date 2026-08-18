@@ -10,15 +10,28 @@
 <style>
 :root{
   --bg:#f5f5f7; --panel:#ffffff; --sidebar:#fafafa; --text:#0b0b0d; --muted:#8b8d94; --line:#e9e9ec;
-  --soft:#f1f1f4; --danger:#e0334f; --other-bubble:#f0f0f2; --other-text:#0b0b0d;
-  --g1:#7C4DFF; --g2:#FF4D8D; --ring:linear-gradient(135deg,#7C4DFF,#FF4D8D 60%,#FFB84D);
+  --soft:#f1f1f4; --danger:#e0334f; --other-bubble:#f0f0f2; --other-text:#0b0b0d; --other-border:transparent;
+  --g1:#7C4DFF; --g2:#FF4D8D; --g3:#FFB84D; --ring:linear-gradient(135deg,var(--g1),var(--g2) 60%,var(--g3));
   --mine-text:#ffffff; --shadow:0 1px 2px rgba(0,0,0,.04),0 6px 20px rgba(0,0,0,.04);
   --radius:20px; --radius-sm:12px;
 }
 body.dark{
   --bg:#000000; --panel:#121214; --sidebar:#0b0b0c; --text:#f2f2f4; --muted:#8e8f97; --line:#232327;
-  --soft:#1b1b1e; --other-bubble:#1e1e22; --other-text:#f2f2f4; --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 24px rgba(0,0,0,.5);
+  --soft:#1b1b1e; --other-bubble:#232329; --other-text:#f2f2f4; --other-border:#2c2c33; --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 24px rgba(0,0,0,.5);
 }
+/* ---------- theme presets (accent colors only; light/dark handled by body.dark above) ---------- */
+body.theme-violet{ --g1:#7C4DFF; --g2:#FF4D8D; --g3:#FFB84D; }
+body.theme-ocean{ --g1:#0EA5E9; --g2:#22D3EE; --g3:#3B82F6; }
+body.theme-forest{ --g1:#16A34A; --g2:#84CC16; --g3:#22C55E; }
+body.theme-sunset{ --g1:#FB923C; --g2:#F43F5E; --g3:#FBBF24; }
+body.theme-berry{ --g1:#D946EF; --g2:#EC4899; --g3:#8B5CF6; }
+body.theme-mono{ --g1:#4b4b52; --g2:#232327; --g3:#71717a; }
+.theme-pop{position:absolute;top:52px;right:16px;z-index:60;background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:10px;display:flex;flex-direction:column;gap:2px;min-width:180px}
+.theme-pop .tp-label{font-size:11px;color:var(--muted);font-weight:700;padding:4px 6px 2px}
+.theme-swatch-row{display:flex;gap:8px;padding:4px 6px 8px;flex-wrap:wrap}
+.theme-swatch{width:28px;height:28px;border-radius:50%;border:2px solid transparent;cursor:pointer;flex:none;position:relative}
+.theme-swatch.sel{border-color:var(--text)}
+.theme-swatch.sel::after{content:"✓";position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-size:13px;text-shadow:0 1px 3px #0007}
 *{box-sizing:border-box}
 html,body{height:100%}
 body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans Thai","Helvetica Neue",Arial,sans-serif;color:var(--text);background:var(--bg);overflow:hidden}
@@ -106,6 +119,7 @@ main.chatpane{display:flex;flex-direction:column;min-width:0;background:var(--bg
 .day-pill span{background:var(--soft);color:var(--muted);font-size:11px;font-weight:700;padding:5px 12px;border-radius:999px}
 
 .group{display:flex;gap:8px;margin:2px 0;align-items:flex-end}
+.group.gap-before{margin-top:16px}
 .group.mine{flex-direction:row-reverse}
 .group .gutter{width:28px;flex:none}
 .group .col{display:flex;flex-direction:column;max-width:78%;min-width:0}
@@ -115,8 +129,8 @@ main.chatpane{display:flex;flex-direction:column;min-width:0;background:var(--bg
 
 .bubble-row{display:flex;align-items:flex-end;gap:6px;position:relative}
 .group.mine .bubble-row{flex-direction:row-reverse}
-.bubble{background:var(--other-bubble);color:var(--other-text);border-radius:18px;padding:9px 13px;font-size:14.5px;line-height:1.42;white-space:pre-wrap;overflow-wrap:anywhere;box-shadow:var(--shadow);position:relative}
-.group.mine .bubble{background:var(--ring);color:var(--mine-text)}
+.bubble{background:var(--other-bubble);color:var(--other-text);border:1px solid var(--other-border);border-radius:18px;padding:9px 13px;font-size:14.5px;line-height:1.42;white-space:pre-wrap;overflow-wrap:anywhere;box-shadow:var(--shadow);position:relative}
+.group.mine .bubble{background:var(--ring);color:var(--mine-text);border-color:transparent;box-shadow:0 2px 10px -2px color-mix(in srgb,var(--g1) 55%,transparent),var(--shadow)}
 .bubble mark{background:#FFD54D;color:#332600;border-radius:3px;padding:0 1px}
 .group.mine .bubble mark{background:#ffffffb0;color:#332600}
 .stack .bubble{margin-top:3px}
@@ -190,6 +204,17 @@ main.chatpane{display:flex;flex-direction:column;min-width:0;background:var(--bg
 
 footer.foot{position:fixed;bottom:0;right:0;font-size:10px;color:var(--muted);padding:6px 12px;z-index:2;pointer-events:none}
 
+/* toast */
+.toast-wrap{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:90;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none}
+.toast{pointer-events:auto;background:var(--panel);color:var(--text);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:14px;padding:10px 16px;font-size:12.5px;max-width:min(90vw,420px);display:flex;align-items:center;gap:10px;animation:toastin .18s ease}
+@keyframes toastin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.toast b{font-weight:800}
+
+/* restore banner */
+.restore-card{margin:10px 8px;padding:14px 16px;border-radius:16px;background:var(--panel);border:1px solid var(--line);display:flex;align-items:center;gap:10px}
+.restore-card .rtxt{flex:1;min-width:0;font-size:12.5px;color:var(--muted)}
+.restore-card .rtxt b{color:var(--text);display:block;font-size:13.5px;margin-bottom:2px}
+
 /* mobile */
 @media(max-width:820px){
   #app{grid-template-columns:1fr}
@@ -198,8 +223,11 @@ footer.foot{position:fixed;bottom:0;right:0;font-size:10px;color:var(--muted);pa
   body.thread-open main.chatpane{transform:translateX(0)}
   body.thread-open aside.sidebar{transform:translateX(-100%);transition:transform .22s ease}
   .backbtn{display:grid}
-  .group .col{max-width:86%}
+  .group .col{max-width:80%}
   .msg-inner{padding:0 10px}
+  .group.gap-before{margin-top:14px}
+  .sender-label{font-size:11px}
+  .theme-pop{right:8px;top:50px;min-width:170px}
 }
 @media(prefers-reduced-motion:reduce){*{animation-duration:.001ms !important;transition-duration:.001ms !important}}
 </style>
@@ -211,6 +239,9 @@ footer.foot{position:fixed;bottom:0;right:0;font-size:10px;color:var(--muted);pa
       <div class="sb-title-row">
         <div class="sb-title">คลังแชต</div>
         <div class="grow"></div>
+        <div style="position:relative">
+          <button class="iconbtn" id="paletteBtn" title="ธีมสี">🎨</button>
+        </div>
         <button class="iconbtn" id="themeBtn" title="สลับธีม">☾</button>
         <button class="iconbtn" id="helpBtn" title="วิธีใช้">?</button>
       </div>
@@ -240,6 +271,7 @@ footer.foot{position:fixed;bottom:0;right:0;font-size:10px;color:var(--muted);pa
 
 <footer class="foot">ข้อมูลอยู่ในเครื่องนี้เท่านั้น • ไม่มีการอัปโหลด</footer>
 
+<div id="toastWrap" class="toast-wrap"></div>
 <div id="lightbox" class="lightbox hidden"></div>
 <div id="modal" class="modal hidden"><div class="modalbox">
   <div class="modal-top"><h2 id="modalTitle"></h2><div class="grow"></div><button class="iconbtn" id="modalClose">✕</button></div>
@@ -264,6 +296,144 @@ let threadSearch="", msgSearch="", kindFilter="", personFilter="", dateFrom="", 
 let renderedCount=200;
 const PAGE=200, GROUP_GAP=5*60*1000;
 const PALETTE=[["#7C4DFF","#FF4D8D"],["#22c1c3","#7C4DFF"],["#ff8a65","#e0334f"],["#4facfe","#7C4DFF"],["#f7971e","#ff4d8d"],["#43e97b","#22c1c3"],["#a18cd1","#fbc2eb"]];
+
+/* ============ toast ============ */
+function showToast(html,ms){
+  const wrap=$("#toastWrap"); if(!wrap)return;
+  const el=document.createElement("div"); el.className="toast"; el.innerHTML=html;
+  wrap.appendChild(el);
+  setTimeout(()=>{ el.style.opacity="0"; el.style.transition="opacity .25s"; setTimeout(()=>el.remove(),260); },ms||3200);
+}
+
+/* ============ IndexedDB persistence ============ */
+const IDB_NAME="chatArchiveDB", IDB_VER=1;
+let idbPromise=null, mediaSaveFailStreak=0, mediaSaveDisabled=false, savedMediaKeys=new Set();
+function idbOpen(){
+  if(idbPromise)return idbPromise;
+  idbPromise=new Promise((resolve,reject)=>{
+    if(!('indexedDB' in window)){ reject(new Error("no-idb")); return; }
+    const req=indexedDB.open(IDB_NAME,IDB_VER);
+    req.onupgradeneeded=()=>{
+      const db=req.result;
+      if(!db.objectStoreNames.contains("kv")) db.createObjectStore("kv");
+      if(!db.objectStoreNames.contains("media")) db.createObjectStore("media");
+    };
+    req.onsuccess=()=>resolve(req.result);
+    req.onerror=()=>reject(req.error);
+  });
+  return idbPromise;
+}
+async function idbSet(store,key,val){
+  const db=await idbOpen();
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(store,"readwrite");
+    tx.objectStore(store).put(val,key);
+    tx.oncomplete=()=>resolve(true);
+    tx.onerror=()=>reject(tx.error);
+  });
+}
+async function idbGet(store,key){
+  const db=await idbOpen();
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(store,"readonly");
+    const r=tx.objectStore(store).get(key);
+    r.onsuccess=()=>resolve(r.result);
+    r.onerror=()=>reject(r.error);
+  });
+}
+async function idbClear(store){
+  const db=await idbOpen();
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(store,"readwrite");
+    tx.objectStore(store).clear();
+    tx.oncomplete=()=>resolve(true);
+    tx.onerror=()=>reject(tx.error);
+  });
+}
+async function idbCountMedia(){
+  try{
+    const db=await idbOpen();
+    return new Promise(resolve=>{
+      const tx=db.transaction("media","readonly");
+      const r=tx.objectStore("media").count();
+      r.onsuccess=()=>resolve(r.result||0);
+      r.onerror=()=>resolve(0);
+    });
+  }catch(e){ return 0; }
+}
+
+/* save the lightweight, always-safe part of state (messages + index, no blobs) */
+let saveStateTimer=null;
+function scheduleSaveState(){ clearTimeout(saveStateTimer); saveStateTimer=setTimeout(saveState,400); }
+async function saveState(){
+  try{
+    const payload={
+      threads: threads.map(t=>({key:t.key,title:t.title,participants:t.participants,messages:t.messages,files:t.files,lastTs:t.lastTs})),
+      mediaIndex: mediaItems.map(m=>({path:m.path,type:savedMediaKeys.has(normPath(m.path))?"idb":m.type})),
+      meName, meOverride:[...meOverride.entries()],
+      savedAt: Date.now()
+    };
+    await idbSet("kv","state",payload);
+  }catch(e){ /* best effort */ }
+}
+function normPath(p){ return String(p||"").replace(/\\/g,"/").toLowerCase(); }
+
+/* save media blobs to IDB in the background, best-effort, stop if quota runs out */
+async function persistNewMedia(items){
+  if(mediaSaveDisabled || !items.length) return;
+  let savedAny=false;
+  for(const it of items){
+    if(mediaSaveDisabled) break;
+    const key=normPath(it.path);
+    if(savedMediaKeys.has(key)) continue;
+    try{
+      let blob;
+      if(it.type==="file") blob=it.ref;
+      else if(it.type==="zip") blob=await it.ref.async("blob");
+      else continue;
+      await idbSet("media",key,blob);
+      savedMediaKeys.add(key);
+      savedAny=true;
+      mediaSaveFailStreak=0;
+    }catch(e){
+      mediaSaveFailStreak++;
+      if(mediaSaveFailStreak>=3){
+        mediaSaveDisabled=true;
+        showToast(`⚠️ พื้นที่จัดเก็บในเครื่องเต็ม บันทึกไฟล์สื่อได้บางส่วนเท่านั้น (ข้อความยังบันทึกครบ)`,4500);
+        break;
+      }
+    }
+    // yield to keep UI responsive
+    await new Promise(r=>setTimeout(r,0));
+  }
+  if(savedAny) scheduleSaveState();
+}
+
+async function restoreState(){
+  try{
+    const s=await idbGet("kv","state");
+    if(!s || !s.threads || !s.threads.length) return false;
+    threads=s.threads;
+    meName=s.meName||null;
+    meOverride=new Map(s.meOverride||[]);
+    for(const mi of (s.mediaIndex||[])){
+      addMediaItem(mi.path,"idb",null);
+      if(mi.type==="idb") savedMediaKeys.add(normPath(mi.path));
+    }
+    threads.sort((a,b)=>b.lastTs-a.lastTs);
+    return true;
+  }catch(e){ return false; }
+}
+
+async function clearAllSavedData(){
+  try{ await idbClear("kv"); await idbClear("media"); }catch(e){}
+  threads=[]; mediaItems=[]; mediaMaps={full:new Map(),seg3:new Map(),seg2:new Map(),base:new Map()};
+  savedMediaKeys=new Set(); mediaSaveDisabled=false; mediaSaveFailStreak=0;
+  meName=null; meOverride=new Map(); activeKey=null;
+  document.body.classList.remove("thread-open");
+  activeTab="import"; setActiveTab(); renderHeader(); renderMessages(true);
+  showToast("ลบข้อมูลที่บันทึกไว้ในเครื่องนี้แล้ว");
+}
 
 /* ============ text repair / helpers ============ */
 function repairScore(s){return (s.match(/[à¸ÂÃð]/g)||[]).length+(s.match(/[\u0080-\u009f]/g)||[]).length}
@@ -306,57 +476,69 @@ async function getMediaURL(uri){
   if(it.url)return it.url;
   try{
     if(it.type==="file"){it.url=URL.createObjectURL(it.ref);return it.url}
+    if(it.type==="idb"){
+      const blob=await idbGet("media",normPath(it.path));
+      if(!blob)return null;
+      it.url=URL.createObjectURL(blob);return it.url;
+    }
     const blob=await it.ref.async("blob");it.url=URL.createObjectURL(blob);return it.url;
   }catch(e){return null}
 }
 
-/* ============ import: zip ============ */
-async function loadZip(file){
-  showImportProgress("กำลังเปิด ZIP...");
+/* ============ import: zip (supports multiple files, processed sequentially) ============ */
+async function loadZips(files){
+  const list=[...files].filter(f=>/\.zip$/i.test(f.name));
+  if(!list.length)return;
   let JSZip;
   try{ JSZip=(await import("https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm")).default||(await import("https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm")); }
   catch(e){ renderImportError("โหลดตัวช่วยแตก ZIP ไม่สำเร็จ (ต้องต่ออินเทอร์เน็ตครั้งแรก) ลองใหม่ หรือแตก ZIP เองแล้วเลือกโฟลเดอร์แทน"); return; }
-  let zip;
-  try{ zip=await JSZip.loadAsync(file); }catch(e){ renderImportError("เปิดไฟล์ ZIP ไม่สำเร็จ ไฟล์อาจเสียหรือไม่ใช่ ZIP"); return; }
 
-  const entries=Object.entries(zip.files).filter(([,o])=>!o.dir);
-  const msgFiles=[]; let mediaCount=0;
-  let i=0;
-  for(const [name,obj] of entries){
-    i++;
-    const base=name.split("/").pop();
-    if(/message(_\d+)?\.json$/i.test(base)){
-      try{ const text=await obj.async("string"); msgFiles.push({path:name,data:deep(JSON.parse(text))}); }catch(e){}
-    }else{
-      addMediaItem(name,"zip",obj); mediaCount++;
+  const allMsgFiles=[]; const newlyAddedMedia=[];
+  for(let fi=0;fi<list.length;fi++){
+    const file=list[fi];
+    const filePrefix=list.length>1?`ไฟล์ ${fi+1}/${list.length}: `:"";
+    showImportProgress(`${filePrefix}กำลังเปิด ${esc(file.name)}...`);
+    let zip;
+    try{ zip=await JSZip.loadAsync(file); }catch(e){ showToast(`⚠️ เปิด ${esc(file.name)} ไม่สำเร็จ ข้ามไฟล์นี้`); continue; }
+    const entries=Object.entries(zip.files).filter(([,o])=>!o.dir);
+    let i=0;
+    for(const [name,obj] of entries){
+      i++;
+      const base=name.split("/").pop();
+      if(/message(_\d+)?\.json$/i.test(base)){
+        try{ const text=await obj.async("string"); allMsgFiles.push({path:name,data:deep(JSON.parse(text))}); }catch(e){}
+      }else{
+        addMediaItem(name,"zip",obj); newlyAddedMedia.push(mediaItems[mediaItems.length-1]);
+      }
+      if(i%40===0)setImportProgress(i/entries.length,`${filePrefix}${i.toLocaleString()}/${entries.length.toLocaleString()} รายการ`);
     }
-    if(i%40===0)setImportProgress(i/entries.length,`${i.toLocaleString()}/${entries.length.toLocaleString()} รายการ`);
   }
-  if(!msgFiles.length){ renderImportError("หา message_*.json ไม่เจอในไฟล์นี้ อาจไม่ใช่รูปแบบ export ที่รองรับ"); return; }
-  finishImport(msgFiles);
+  if(!allMsgFiles.length){ renderImportError("หา message_*.json ไม่เจอในไฟล์ที่เลือก อาจไม่ใช่รูปแบบ export ที่รองรับ"); return; }
+  finishImport(allMsgFiles, newlyAddedMedia);
 }
+function loadZip(file){ return loadZips([file]); }
 
 /* ============ import: folder / plain json files ============ */
 async function loadFileList(fileList){
   const files=[...fileList];
   showImportProgress("กำลังนำเข้าไฟล์...");
-  const msgFiles=[]; let i=0;
+  const msgFiles=[]; const newlyAddedMedia=[]; let i=0;
   for(const f of files){
     i++;
     const rel=f.webkitRelativePath||f.name;
     if(/\.json$/i.test(f.name)){
       try{ const text=await f.text(); const data=JSON.parse(text); if(Array.isArray(data.messages)) msgFiles.push({path:rel,data:deep(data)}); }catch(e){}
     }else{
-      addMediaItem(rel,"file",f);
+      addMediaItem(rel,"file",f); newlyAddedMedia.push(mediaItems[mediaItems.length-1]);
     }
     if(i%25===0)setImportProgress(i/files.length,`${i}/${files.length} ไฟล์`);
   }
   if(!msgFiles.length){ renderImportError("ไม่พบไฟล์ JSON ของแชตในสิ่งที่เลือก (ต้องเป็น message_*.json)"); return; }
-  finishImport(msgFiles);
+  finishImport(msgFiles, newlyAddedMedia);
 }
 
 /* ============ grouping message files into threads ============ */
-function finishImport(msgFiles){
+function finishImport(msgFiles, newlyAddedMedia){
   const groups=new Map(); // key -> {title,messages:[],files:[],participantsSet}
   for(const {path,data} of msgFiles){
     const title=repair(data.title||"")||null;
@@ -406,6 +588,8 @@ function finishImport(msgFiles){
   renderSidebar();
   if(!activeKey && threads.length) selectThread(threads[0].key);
   else if(activeKey) renderHeader(), renderMessages(true);
+  scheduleSaveState();
+  if(newlyAddedMedia && newlyAddedMedia.length) persistNewMedia(newlyAddedMedia);
 }
 
 function computeMeName(){
@@ -445,15 +629,15 @@ function renderImportPanel(){
     <h3>เปิดไฟล์ ZIP export</h3>
     <p>ลากไฟล์มาวางตรงนี้ได้เลย หรือเลือกไฟล์ ZIP ที่ได้จาก Instagram/Facebook โดยตรง ระบบจะดึงทั้งข้อความและรูป/วิดีโอ/เสียงในนั้นให้อัตโนมัติ</p>
     <div class="import-actions">
-      <label class="pillbtn primary">📦 เลือกไฟล์ ZIP<input id="zipInput" type="file" accept=".zip" hidden></label>
+      <label class="pillbtn primary">📦 เลือกไฟล์ ZIP (เลือกได้หลายไฟล์)<input id="zipInput" type="file" accept=".zip" multiple hidden></label>
       <label class="pillbtn">📂 เลือกโฟลเดอร์ที่แตกแล้ว<input id="folderInput" type="file" webkitdirectory directory multiple hidden></label>
       <label class="pillbtn">📄 เลือกไฟล์ JSON (ไม่มีสื่อ)<input id="jsonInput" type="file" multiple accept=".json" hidden></label>
     </div>
-    <div class="dropzone-hint">ข้อมูลทั้งหมดประมวลผลในเครื่องนี้เท่านั้น • นำเข้าเพิ่มได้เรื่อยๆ ไม่ต้องเริ่มใหม่</div>
+    <div class="dropzone-hint">ข้อมูลทั้งหมดประมวลผลในเครื่องนี้เท่านั้น • นำเข้าเพิ่มได้เรื่อยๆ ไม่ต้องเริ่มใหม่ • บันทึกอัตโนมัติไว้ในเครื่องนี้ เปิดแอปใหม่ก็ยังอยู่</div>
   </div>
   ${threads.length?`<div class="import-card" style="text-align:left"><h4 style="margin:0 0 6px;font-size:13px">นำเข้าแล้ว ${threads.length} แชต</h4><p style="margin:0">รวม ${threads.reduce((a,t)=>a+t.messages.length,0).toLocaleString()} ข้อความ • ไฟล์สื่อ ${mediaItems.length.toLocaleString()} รายการ</p></div>`:""}
   `;
-  $("#zipInput").onchange=e=>{ const f=e.target.files[0]; if(f) loadZip(f); };
+  $("#zipInput").onchange=e=>{ if(e.target.files.length) loadZips(e.target.files); };
   $("#folderInput").onchange=e=>{ if(e.target.files.length) loadFileList(e.target.files); };
   $("#jsonInput").onchange=e=>{ if(e.target.files.length) loadFileList(e.target.files); };
 }
@@ -496,20 +680,30 @@ function renderChatList(){
   $$(".thread-row").forEach(r=>r.onclick=()=>selectThread(r.dataset.key));
 }
 
-function renderToolsPanel(){
+async function renderToolsPanel(){
   const scope=activeKey?threads.find(t=>t.key===activeKey):null;
+  let storageLine="กำลังตรวจสอบพื้นที่จัดเก็บ...";
   $("#sbBody").innerHTML=`
   <div class="card"><h4>🧠 วิเคราะห์${scope?" แชตนี้":"ทั้งหมด"}</h4><p>สถิติและคำที่พบบ่อย ประมวลผลในเครื่อง ไม่ใช้ AI</p><button class="pillbtn primary" id="btnAnalyze" style="width:100%">วิเคราะห์ตอนนี้</button></div>
   <div class="card"><h4>📅 Timeline</h4><p>จำนวนข้อความแยกตามเดือน</p><button class="pillbtn" id="btnTimeline" style="width:100%">เปิด Timeline</button></div>
   <div class="card"><h4>⭐ บุ๊กมาร์ก (${bookmarks.size})</h4><p>ข้อความที่เก็บไว้ทั้งหมดทุกแชต</p><button class="pillbtn" id="btnExportBm" style="width:100%">ส่งออกเป็น TXT</button></div>
   <div class="card"><h4>🔁 สลับฝั่ง “ฉัน”</h4><p>ถ้าระบบเดาผิดว่าใครคือคุณในแชตนี้ กดเพื่อเลือกใหม่</p>${scope?`<div class="who-row">${scope.participants.map(p=>`<button class="who-chip ${effectiveMe(scope.key)===p?"sel":""}" data-p="${esc(p)}">${esc(p)}</button>`).join("")}</div>`:`<p class="muted">เปิดแชตก่อนเพื่อตั้งค่า</p>`}</div>
-  <div class="card"><h4>🗑️ ล้างข้อมูล</h4><p>บุ๊กมาร์กเก็บใน browser นี้ ไฟล์แชตจะหายเมื่อปิดแท็บ</p><button class="pillbtn danger" id="btnClearBm" style="width:100%">ล้างบุ๊กมาร์กทั้งหมด</button></div>
-  <div class="card"><h4>🔐 ความเป็นส่วนตัว</h4><p>อ่าน/แตกไฟล์ทั้งหมดในเบราว์เซอร์ของคุณ ไม่มีการส่งข้อความหรือรูปออกจากเครื่อง</p></div>`;
+  <div class="card"><h4>💾 ข้อมูลที่บันทึกในเครื่องนี้</h4><p id="storageLine">${storageLine}</p><button class="pillbtn danger" id="btnClearAll" style="width:100%">ลบข้อมูลแชตทั้งหมดจากเครื่องนี้</button></div>
+  <div class="card"><h4>🗑️ ล้างบุ๊กมาร์ก</h4><p>ล้างเฉพาะรายการบุ๊กมาร์ก ไม่กระทบแชตหรือไฟล์สื่อ</p><button class="pillbtn danger" id="btnClearBm" style="width:100%">ล้างบุ๊กมาร์กทั้งหมด</button></div>
+  <div class="card"><h4>🔐 ความเป็นส่วนตัว</h4><p>อ่าน/แตกไฟล์ทั้งหมดในเบราว์เซอร์ของคุณ ไม่มีการส่งข้อความหรือรูปออกจากเครื่อง แม้แต่ข้อมูลที่บันทึกไว้เพื่อเปิดใช้ครั้งถัดไปก็เก็บอยู่ในเครื่องนี้เท่านั้น</p></div>`;
   $("#btnAnalyze").onclick=()=>analysisModal(scope);
   $("#btnTimeline").onclick=()=>timelineModal(scope);
   $("#btnExportBm").onclick=exportBookmarks;
   $("#btnClearBm").onclick=()=>{ if(confirm("ล้างบุ๊กมาร์กทั้งหมด?")){ bookmarks.clear(); persistBookmarks(); renderSidebar(); renderMessages(true); } };
-  $$(".who-chip").forEach(c=>c.onclick=()=>{ meOverride.set(scope.key,c.dataset.p); renderSidebar(); renderHeader(); renderMessages(true); });
+  $("#btnClearAll").onclick=()=>{ if(confirm("ลบแชตและไฟล์สื่อทั้งหมดที่บันทึกไว้ในเครื่องนี้? การกระทำนี้ย้อนกลับไม่ได้")) clearAllSavedData(); };
+  $$(".who-chip").forEach(c=>c.onclick=()=>{ meOverride.set(scope.key,c.dataset.p); scheduleSaveState(); renderSidebar(); renderHeader(); renderMessages(true); });
+
+  const mediaSaved=await idbCountMedia();
+  let est=null; try{ if(navigator.storage?.estimate) est=await navigator.storage.estimate(); }catch(e){}
+  const usageMB=est?.usage?(est.usage/1048576).toFixed(0):null;
+  const quotaMB=est?.quota?(est.quota/1073741824).toFixed(1):null;
+  const line=`${threads.reduce((a,t)=>a+t.messages.length,0).toLocaleString()} ข้อความ • ไฟล์สื่อบันทึกแล้ว ${mediaSaved.toLocaleString()}/${mediaItems.length.toLocaleString()} รายการ${usageMB?` • ใช้พื้นที่ราว ${usageMB} MB${quotaMB?` จาก ${quotaMB} GB`:""}`:""}${mediaSaveDisabled?" • พื้นที่เต็ม จึงหยุดบันทึกไฟล์สื่อเพิ่ม":""}`;
+  const sl=$("#storageLine"); if(sl) sl.textContent=line;
 }
 
 /* ============ thread selection & header ============ */
@@ -814,8 +1008,11 @@ $("#messages").addEventListener("scroll",()=>{
 window.addEventListener("drop",e=>{
   const f=[...(e.dataTransfer?.files||[])];
   if(!f.length)return;
-  if(f.length===1 && /\.zip$/i.test(f[0].name)){ activeTab="import"; setActiveTab(); loadZip(f[0]); }
-  else{ activeTab="import"; setActiveTab(); loadFileList(f); }
+  const zips=f.filter(x=>/\.zip$/i.test(x.name));
+  const rest=f.filter(x=>!/\.zip$/i.test(x.name));
+  activeTab="import"; setActiveTab();
+  if(zips.length) loadZips(zips);
+  if(rest.length) loadFileList(rest);
 });
 
 /* init */
