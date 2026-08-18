@@ -1,0 +1,827 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#7C4DFF">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Chat Archive — คลังแชตของฉัน</title>
+<style>
+:root{
+  --bg:#f5f5f7; --panel:#ffffff; --sidebar:#fafafa; --text:#0b0b0d; --muted:#8b8d94; --line:#e9e9ec;
+  --soft:#f1f1f4; --danger:#e0334f; --other-bubble:#f0f0f2; --other-text:#0b0b0d;
+  --g1:#7C4DFF; --g2:#FF4D8D; --ring:linear-gradient(135deg,#7C4DFF,#FF4D8D 60%,#FFB84D);
+  --mine-text:#ffffff; --shadow:0 1px 2px rgba(0,0,0,.04),0 6px 20px rgba(0,0,0,.04);
+  --radius:20px; --radius-sm:12px;
+}
+body.dark{
+  --bg:#000000; --panel:#121214; --sidebar:#0b0b0c; --text:#f2f2f4; --muted:#8e8f97; --line:#232327;
+  --soft:#1b1b1e; --other-bubble:#1e1e22; --other-text:#f2f2f4; --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 24px rgba(0,0,0,.5);
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans Thai","Helvetica Neue",Arial,sans-serif;color:var(--text);background:var(--bg);overflow:hidden}
+button{font:inherit;cursor:pointer}
+button,input,select,textarea{color:inherit}
+::selection{background:#7C4DFF33}
+a{color:var(--g1)}
+.hidden{display:none !important}
+.iconbtn{width:38px;height:38px;border-radius:50%;border:0;background:transparent;display:grid;place-items:center;font-size:17px;color:var(--text);transition:background .15s}
+.iconbtn:hover{background:var(--soft)}
+.pillbtn{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:8px 14px;font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:6px;transition:.15s}
+.pillbtn:hover{background:var(--soft)}
+.pillbtn.primary{background:var(--ring);color:#fff;border:0}
+.pillbtn.primary:hover{filter:brightness(1.06)}
+.pillbtn.danger{color:var(--danger)}
+.scroll{overflow-y:auto;scrollbar-width:thin}
+.scroll::-webkit-scrollbar{width:8px}
+.scroll::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px}
+
+/* ---------- App shell ---------- */
+#app{display:grid;grid-template-columns:360px 1fr;height:100vh;height:100dvh}
+aside.sidebar{background:var(--sidebar);border-right:1px solid var(--line);display:flex;flex-direction:column;min-width:0}
+.sb-head{padding:16px 16px 10px;flex:none}
+.sb-title-row{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.sb-title{font-weight:800;font-size:21px;letter-spacing:-.02em}
+.grow{flex:1}
+.sb-search{position:relative}
+.sb-search input{width:100%;padding:10px 14px 10px 36px;border-radius:999px;border:1px solid var(--line);background:var(--soft);font-size:14px}
+.sb-search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:.5}
+.sb-tabs{display:flex;gap:4px;margin-top:12px;background:var(--soft);border-radius:12px;padding:3px}
+.sb-tab{flex:1;border:0;background:transparent;padding:8px;border-radius:9px;font-size:13px;font-weight:700;color:var(--muted)}
+.sb-tab.active{background:var(--panel);color:var(--text);box-shadow:var(--shadow)}
+.sb-body{flex:1;overflow-y:auto;padding:6px 8px 90px}
+
+/* import empty state */
+.import-card{margin:10px 8px;padding:22px 16px;border-radius:var(--radius);background:var(--panel);border:1px dashed var(--line);text-align:center}
+.import-card h3{margin:6px 0 4px;font-size:16px}
+.import-card p{margin:0 0 14px;color:var(--muted);font-size:12.5px;line-height:1.5}
+.import-actions{display:flex;flex-direction:column;gap:8px}
+.import-actions label{width:100%;text-align:center;justify-content:center}
+.dropzone-hint{font-size:11px;color:var(--muted);margin-top:10px}
+
+/* thread list rows */
+.thread-row{display:flex;align-items:center;gap:12px;padding:9px 8px;border-radius:14px;cursor:pointer;position:relative;transition:background .12s}
+.thread-row:hover{background:var(--soft)}
+.thread-row.active{background:var(--soft)}
+.thread-row .meta{min-width:0;flex:1}
+.thread-row .row1{display:flex;justify-content:space-between;gap:8px}
+.thread-row .name{font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.thread-row .time{font-size:11px;color:var(--muted);flex:none}
+.thread-row .preview{font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.thread-row .badge{background:var(--ring);color:#fff;font-size:10.5px;font-weight:700;border-radius:999px;padding:1px 7px;flex:none}
+
+.avatar{border-radius:50%;display:grid;place-items:center;font-weight:800;color:#fff;flex:none;background:var(--ring);position:relative}
+.avatar span{position:relative;z-index:1}
+.avatar.a44{width:44px;height:44px;font-size:16px}
+.avatar.a56{width:56px;height:56px;font-size:19px}
+.avatar.a28{width:28px;height:28px;font-size:11px}
+.avatar.group::after{content:"👥";position:absolute;bottom:-2px;right:-2px;background:var(--panel);border-radius:50%;font-size:11px;padding:1px 2px;box-shadow:var(--shadow)}
+
+/* tools tab cards */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px;margin:8px}
+.card h4{margin:0 0 4px;font-size:13.5px}
+.card p{margin:0 0 10px;font-size:12px;color:var(--muted);line-height:1.5}
+.statline{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);font-size:12.5px}
+.statline:last-child{border:0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px}
+.stat-big{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px}
+.stat-big .n{font-size:22px;font-weight:800}
+.stat-big .l{font-size:11.5px;color:var(--muted);margin-top:2px}
+.chip{display:inline-block;background:var(--soft);border-radius:999px;padding:5px 10px;font-size:11.5px;margin:2px}
+
+/* ---------- Main / chat panel ---------- */
+main.chatpane{display:flex;flex-direction:column;min-width:0;background:var(--bg)}
+.chat-header{flex:none;display:flex;align-items:center;gap:10px;padding:10px 18px;border-bottom:1px solid var(--line);background:color-mix(in srgb,var(--panel) 92%,transparent);backdrop-filter:blur(14px);position:sticky;top:0;z-index:5}
+.chat-header .titlewrap{min-width:0}
+.chat-header .name{font-weight:800;font-size:15px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chat-header .sub{font-size:11.5px;color:var(--muted)}
+.backbtn{display:none}
+
+.messages{flex:1;overflow-y:auto;padding:14px 0 18px}
+.msg-inner{max-width:760px;margin:0 auto;padding:0 18px}
+.loadmore-wrap{text-align:center;padding:10px}
+.day-pill{text-align:center;margin:20px 0 10px}
+.day-pill span{background:var(--soft);color:var(--muted);font-size:11px;font-weight:700;padding:5px 12px;border-radius:999px}
+
+.group{display:flex;gap:8px;margin:2px 0;align-items:flex-end}
+.group.mine{flex-direction:row-reverse}
+.group .gutter{width:28px;flex:none}
+.group .col{display:flex;flex-direction:column;max-width:78%;min-width:0}
+.group.mine .col{align-items:flex-end}
+.sender-label{font-size:11.5px;font-weight:700;color:var(--muted);margin:6px 2px 3px}
+.group.mine .sender-label{display:none}
+
+.bubble-row{display:flex;align-items:flex-end;gap:6px;position:relative}
+.group.mine .bubble-row{flex-direction:row-reverse}
+.bubble{background:var(--other-bubble);color:var(--other-text);border-radius:18px;padding:9px 13px;font-size:14.5px;line-height:1.42;white-space:pre-wrap;overflow-wrap:anywhere;box-shadow:var(--shadow);position:relative}
+.group.mine .bubble{background:var(--ring);color:var(--mine-text)}
+.bubble mark{background:#FFD54D;color:#332600;border-radius:3px;padding:0 1px}
+.group.mine .bubble mark{background:#ffffffb0;color:#332600}
+.stack .bubble{margin-top:3px}
+.bubble.tight{padding:4px}
+.bubble .caption{padding:6px 6px 2px;font-size:13.5px}
+
+.msg-time{font-size:10px;color:var(--muted);opacity:0;transition:opacity .12s;white-space:nowrap;padding:0 3px 4px}
+.bubble-row:hover .msg-time{opacity:1}
+
+.star-btn{opacity:0;width:26px;height:26px;border:0;background:var(--panel);border-radius:50%;display:grid;place-items:center;font-size:13px;box-shadow:var(--shadow);transition:opacity .12s;flex:none;align-self:center}
+.bubble-row:hover .star-btn{opacity:1}
+.star-btn.on{opacity:1;color:#f5a623}
+
+/* media */
+.media-grid{display:grid;gap:3px;border-radius:16px;overflow:hidden;max-width:280px}
+.media-grid.n1{grid-template-columns:1fr}
+.media-grid.n2,.media-grid.n3,.media-grid.n4{grid-template-columns:1fr 1fr}
+.mthumb{position:relative;background:var(--soft);aspect-ratio:1/1;overflow:hidden;cursor:pointer}
+.media-grid.n1 .mthumb{aspect-ratio:4/5}
+.mthumb img,.mthumb video{width:100%;height:100%;object-fit:cover;display:block}
+.mthumb.skeleton{background:linear-gradient(100deg,var(--soft) 30%,var(--line) 50%,var(--soft) 70%);background-size:200% 100%;animation:shimmer 1.3s infinite}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.mthumb .more{position:absolute;inset:0;background:#000a;color:#fff;display:grid;place-items:center;font-weight:800;font-size:18px}
+.mthumb .playicon{position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-size:26px;text-shadow:0 1px 6px #0008;pointer-events:none}
+.audio-card{display:flex;align-items:center;gap:8px;background:var(--soft);border-radius:14px;padding:8px 10px;min-width:220px}
+.group.mine .audio-card{background:#ffffff26}
+.audio-card audio{width:170px;height:32px}
+
+/* share card */
+.share-card{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--panel);max-width:280px}
+.group.mine .share-card{background:#ffffff14;border-color:#ffffff30}
+.share-card .sc-body{padding:9px 11px}
+.share-card .sc-title{font-size:12.5px;font-weight:700;display:flex;align-items:center;gap:6px}
+.share-card .sc-text{font-size:12.5px;margin-top:4px;color:var(--muted)}
+.group.mine .share-card .sc-text{color:#ffffffcc}
+.share-card a.sc-link{display:block;font-size:11.5px;padding:8px 11px;border-top:1px solid var(--line);color:var(--g1);text-decoration:none;font-weight:700}
+.group.mine .share-card a.sc-link{border-top-color:#ffffff30;color:#fff}
+
+.reactions{display:flex;gap:4px;margin-top:4px;flex-wrap:wrap}
+.group.mine .reactions{justify-content:flex-end}
+.reaction-pill{background:var(--panel);border:1px solid var(--line);border-radius:999px;font-size:11px;padding:2px 7px;box-shadow:var(--shadow)}
+
+.empty-state{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:var(--muted);padding:30px}
+.empty-state .emoji{font-size:52px;margin-bottom:10px}
+.empty-state h2{color:var(--text);margin:0 0 6px;font-size:18px}
+.empty-state p{margin:0;font-size:13px;max-width:320px;line-height:1.6}
+
+.progress{height:6px;background:var(--soft);border-radius:9px;overflow:hidden;margin:14px auto 0;max-width:260px}
+.progress>div{height:100%;width:0%;background:var(--ring);transition:width .15s}
+
+/* filters bar */
+.filters{display:flex;gap:8px;flex-wrap:wrap;padding:10px 18px;border-bottom:1px solid var(--line);background:var(--panel)}
+.filters select,.filters input[type=date]{border:1px solid var(--line);border-radius:10px;padding:7px 9px;background:var(--soft);font-size:12.5px}
+
+/* lightbox */
+.lightbox{position:fixed;inset:0;background:#000d;z-index:80;display:grid;place-items:center;padding:20px}
+.lightbox img,.lightbox video{max-width:min(94vw,900px);max-height:88vh;border-radius:10px;box-shadow:0 20px 60px #0009}
+.lightbox .lb-close{position:absolute;top:16px;right:18px;width:42px;height:42px;border-radius:50%;background:#ffffff22;color:#fff;border:0;font-size:18px}
+.lightbox .lb-dl{position:absolute;top:16px;right:70px;width:42px;height:42px;border-radius:50%;background:#ffffff22;color:#fff;border:0;font-size:16px;display:grid;place-items:center;text-decoration:none}
+
+/* generic modal */
+.modal{position:fixed;inset:0;background:#0008;z-index:70;display:grid;place-items:center;padding:16px}
+.modalbox{width:min(640px,100%);max-height:88vh;overflow:auto;background:var(--panel);border-radius:20px;padding:18px;box-shadow:var(--shadow)}
+.modalbox h2{margin:0;font-size:17px}
+.modal-top{display:flex;align-items:center}
+
+/* choose-me picker */
+.who-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.who-chip{border:1.5px solid var(--line);background:var(--panel);border-radius:999px;padding:8px 14px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px}
+.who-chip.sel{border-color:var(--g1);background:#7C4DFF14}
+
+footer.foot{position:fixed;bottom:0;right:0;font-size:10px;color:var(--muted);padding:6px 12px;z-index:2;pointer-events:none}
+
+/* mobile */
+@media(max-width:820px){
+  #app{grid-template-columns:1fr}
+  aside.sidebar{position:fixed;inset:0;z-index:10;width:100%}
+  main.chatpane{position:fixed;inset:0;z-index:9;transform:translateX(100%);transition:transform .22s ease}
+  body.thread-open main.chatpane{transform:translateX(0)}
+  body.thread-open aside.sidebar{transform:translateX(-100%);transition:transform .22s ease}
+  .backbtn{display:grid}
+  .group .col{max-width:86%}
+  .msg-inner{padding:0 10px}
+}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.001ms !important;transition-duration:.001ms !important}}
+</style>
+</head>
+<body>
+<div id="app">
+  <aside class="sidebar">
+    <div class="sb-head">
+      <div class="sb-title-row">
+        <div class="sb-title">คลังแชต</div>
+        <div class="grow"></div>
+        <button class="iconbtn" id="themeBtn" title="สลับธีม">☾</button>
+        <button class="iconbtn" id="helpBtn" title="วิธีใช้">?</button>
+      </div>
+      <div class="sb-search">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input id="threadSearch" type="search" placeholder="ค้นหาแชตหรือข้อความ">
+      </div>
+      <div class="sb-tabs">
+        <button class="sb-tab active" id="tabChats">💬 แชต</button>
+        <button class="sb-tab" id="tabTools">🧰 เครื่องมือ</button>
+        <button class="sb-tab" id="tabImport">➕ นำเข้า</button>
+      </div>
+    </div>
+    <div class="sb-body scroll" id="sbBody"></div>
+  </aside>
+
+  <main class="chatpane">
+    <div class="chat-header hidden" id="chatHeader"></div>
+    <div class="filters hidden" id="filtersBar"></div>
+    <div class="messages scroll" id="messages"><div class="empty-state">
+      <div class="emoji">📖</div>
+      <h2>ยังไม่ได้เปิดแชตไหน</h2>
+      <p>นำเข้าไฟล์ ZIP ที่ export มา หรือเลือกโฟลเดอร์ที่แตกไว้แล้ว จากแท็บ “นำเข้า” ทางซ้าย จากนั้นเลือกแชตที่ต้องการอ่านได้เลย</p>
+    </div></div>
+  </main>
+</div>
+
+<footer class="foot">ข้อมูลอยู่ในเครื่องนี้เท่านั้น • ไม่มีการอัปโหลด</footer>
+
+<div id="lightbox" class="lightbox hidden"></div>
+<div id="modal" class="modal hidden"><div class="modalbox">
+  <div class="modal-top"><h2 id="modalTitle"></h2><div class="grow"></div><button class="iconbtn" id="modalClose">✕</button></div>
+  <div id="modalBody" style="margin-top:12px"></div>
+</div></div>
+
+<script>
+"use strict";
+const $=s=>document.querySelector(s);
+const $$=s=>[...document.querySelectorAll(s)];
+
+/* ============ state ============ */
+let threads=[];              // {key,title,participants:Set,messages:[],files:[],lastTs}
+let mediaItems=[];           // {path,type:'zip'|'file',ref,url}
+let mediaMaps={full:new Map(),seg3:new Map(),seg2:new Map(),base:new Map()};
+let bookmarks=new Set();
+let meName=null;
+let meOverride=new Map();    // threadKey -> forced "me" name
+let activeKey=null;
+let activeTab="chats";
+let threadSearch="", msgSearch="", kindFilter="", personFilter="", dateFrom="", dateTo="";
+let renderedCount=200;
+const PAGE=200, GROUP_GAP=5*60*1000;
+const PALETTE=[["#7C4DFF","#FF4D8D"],["#22c1c3","#7C4DFF"],["#ff8a65","#e0334f"],["#4facfe","#7C4DFF"],["#f7971e","#ff4d8d"],["#43e97b","#22c1c3"],["#a18cd1","#fbc2eb"]];
+
+/* ============ text repair / helpers ============ */
+function repairScore(s){return (s.match(/[à¸ÂÃð]/g)||[]).length+(s.match(/[\u0080-\u009f]/g)||[]).length}
+function repair(s){if(typeof s!=="string"||repairScore(s)<2)return s;let b=s,bs=repairScore(s);for(let i=0;i<3;i++){try{const bytes=new Uint8Array([...b].map(c=>c.charCodeAt(0)&255));const x=new TextDecoder("utf-8").decode(bytes),sc=repairScore(x);if(sc<bs){b=x;bs=sc}else break}catch(e){break}}return b}
+function deep(x){if(typeof x==="string")return repair(x);if(Array.isArray(x))return x.map(deep);if(x&&typeof x==="object"){const o={};for(const k in x)o[k]=deep(x[k]);return o}return x}
+function esc(s){return String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function hi(s){const t=esc(s);if(!msgSearch)return t;const z=msgSearch.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");return t.split(new RegExp("("+z+")","ig")).map((x,i)=>i%2?`<mark>${x}</mark>`:x).join("")}
+function fmtTime(t){return new Date(t).toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"})}
+function fmtDay(t){return new Date(t).toLocaleDateString("th-TH",{dateStyle:"long"})}
+function fmtShort(t){const d=new Date(t),now=new Date();const sameDay=d.toDateString()===now.toDateString();if(sameDay)return fmtTime(t);const diffDays=Math.round((now-d)/86400000);if(diffDays<7)return d.toLocaleDateString("th-TH",{weekday:"short"});return d.toLocaleDateString("th-TH",{day:"numeric",month:"short"})}
+function hasMedia(m){return !!((m.photos&&m.photos.length)||(m.videos&&m.videos.length)||(m.audio_files&&m.audio_files.length)||(m.gifs&&m.gifs.length)||(m.sticker&&m.sticker.uri))}
+function initials(name){const n=(name||"?").trim();if(!n)return"?";const parts=n.split(/\s+/);const chars=[...parts[0]][0]||"?";return chars.toUpperCase()}
+function hashIdx(name,mod){let h=0;for(const c of String(name||""))h=(h*31+c.charCodeAt(0))>>>0;return h%mod}
+function gradFor(name){const [a,b]=PALETTE[hashIdx(name,PALETTE.length)];return `linear-gradient(135deg,${a},${b})`}
+
+/* ============ media index (lazy blob resolution) ============ */
+function addMediaItem(path,type,ref){
+  const idx=mediaItems.length;mediaItems.push({path,type,ref,url:null});
+  const norm=path.replace(/\\/g,"/").toLowerCase();
+  mediaMaps.full.set(norm,idx);
+  const segs=norm.split("/");
+  mediaMaps.base.set(segs[segs.length-1],idx);
+  if(segs.length>=2)mediaMaps.seg2.set(segs.slice(-2).join("/"),idx);
+  if(segs.length>=3)mediaMaps.seg3.set(segs.slice(-3).join("/"),idx);
+}
+function findMediaIdx(uri){
+  if(!uri)return -1;
+  const norm=uri.replace(/\\/g,"/").toLowerCase();
+  if(mediaMaps.full.has(norm))return mediaMaps.full.get(norm);
+  const segs=norm.split("/");
+  if(segs.length>=3){const k=segs.slice(-3).join("/");if(mediaMaps.seg3.has(k))return mediaMaps.seg3.get(k)}
+  if(segs.length>=2){const k=segs.slice(-2).join("/");if(mediaMaps.seg2.has(k))return mediaMaps.seg2.get(k)}
+  const base=segs[segs.length-1];
+  if(mediaMaps.base.has(base))return mediaMaps.base.get(base);
+  return -1;
+}
+async function getMediaURL(uri){
+  const idx=findMediaIdx(uri);if(idx<0)return null;
+  const it=mediaItems[idx];
+  if(it.url)return it.url;
+  try{
+    if(it.type==="file"){it.url=URL.createObjectURL(it.ref);return it.url}
+    const blob=await it.ref.async("blob");it.url=URL.createObjectURL(blob);return it.url;
+  }catch(e){return null}
+}
+
+/* ============ import: zip ============ */
+async function loadZip(file){
+  showImportProgress("กำลังเปิด ZIP...");
+  let JSZip;
+  try{ JSZip=(await import("https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm")).default||(await import("https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm")); }
+  catch(e){ renderImportError("โหลดตัวช่วยแตก ZIP ไม่สำเร็จ (ต้องต่ออินเทอร์เน็ตครั้งแรก) ลองใหม่ หรือแตก ZIP เองแล้วเลือกโฟลเดอร์แทน"); return; }
+  let zip;
+  try{ zip=await JSZip.loadAsync(file); }catch(e){ renderImportError("เปิดไฟล์ ZIP ไม่สำเร็จ ไฟล์อาจเสียหรือไม่ใช่ ZIP"); return; }
+
+  const entries=Object.entries(zip.files).filter(([,o])=>!o.dir);
+  const msgFiles=[]; let mediaCount=0;
+  let i=0;
+  for(const [name,obj] of entries){
+    i++;
+    const base=name.split("/").pop();
+    if(/message(_\d+)?\.json$/i.test(base)){
+      try{ const text=await obj.async("string"); msgFiles.push({path:name,data:deep(JSON.parse(text))}); }catch(e){}
+    }else{
+      addMediaItem(name,"zip",obj); mediaCount++;
+    }
+    if(i%40===0)setImportProgress(i/entries.length,`${i.toLocaleString()}/${entries.length.toLocaleString()} รายการ`);
+  }
+  if(!msgFiles.length){ renderImportError("หา message_*.json ไม่เจอในไฟล์นี้ อาจไม่ใช่รูปแบบ export ที่รองรับ"); return; }
+  finishImport(msgFiles);
+}
+
+/* ============ import: folder / plain json files ============ */
+async function loadFileList(fileList){
+  const files=[...fileList];
+  showImportProgress("กำลังนำเข้าไฟล์...");
+  const msgFiles=[]; let i=0;
+  for(const f of files){
+    i++;
+    const rel=f.webkitRelativePath||f.name;
+    if(/\.json$/i.test(f.name)){
+      try{ const text=await f.text(); const data=JSON.parse(text); if(Array.isArray(data.messages)) msgFiles.push({path:rel,data:deep(data)}); }catch(e){}
+    }else{
+      addMediaItem(rel,"file",f);
+    }
+    if(i%25===0)setImportProgress(i/files.length,`${i}/${files.length} ไฟล์`);
+  }
+  if(!msgFiles.length){ renderImportError("ไม่พบไฟล์ JSON ของแชตในสิ่งที่เลือก (ต้องเป็น message_*.json)"); return; }
+  finishImport(msgFiles);
+}
+
+/* ============ grouping message files into threads ============ */
+function finishImport(msgFiles){
+  const groups=new Map(); // key -> {title,messages:[],files:[],participantsSet}
+  for(const {path,data} of msgFiles){
+    const title=repair(data.title||"")||null;
+    const folder=path.includes("/")?path.slice(0,path.lastIndexOf("/")):"";
+    const base=path.split("/").pop().replace(/_\d+\.json$/i,"").replace(/\.json$/i,"");
+    const key=title?("t:"+title.toLowerCase()):(folder?("f:"+folder.toLowerCase()):("b:"+base.toLowerCase()));
+    if(!groups.has(key))groups.set(key,{title:title||folder.split("/").pop()||base||"แชต",messages:[],files:[],participants:new Set()});
+    const g=groups.get(key);
+    const ms=(data.messages||[]).map((m,idx)=>({
+      sender_name:repair(m.sender_name||"ไม่ทราบชื่อ"),
+      content:m.content?repair(m.content):"",
+      timestamp_ms:+m.timestamp_ms||0,
+      photos:m.photos||null, videos:m.videos||null, audio_files:m.audio_files||null,
+      gifs:m.gifs||null, sticker:m.sticker||null,
+      share:m.share?{link:m.share.link,share_text:m.share.share_text?repair(m.share.share_text):""}:null,
+      reactions:(m.reactions||[]).map(r=>({reaction:repair(r.reaction||""),actor:repair(r.actor||"")})),
+      call_duration: m.call_duration ?? null,
+      _id:key+"#"+path+"#"+idx
+    }));
+    g.messages.push(...ms);
+    (data.participants||[]).forEach(p=>{ if(p&&p.name) g.participants.add(repair(p.name)); });
+    ms.forEach(m=>g.participants.add(m.sender_name));
+    g.files.push({name:path.split("/").pop(),count:ms.length});
+  }
+  const newThreads=[...groups.entries()].map(([key,g])=>{
+    g.messages.sort((a,b)=>a.timestamp_ms-b.timestamp_ms);
+    return {key,title:g.title,participants:[...g.participants],messages:g.messages,files:g.files,lastTs:g.messages.length?g.messages[g.messages.length-1].timestamp_ms:0};
+  });
+
+  // merge with existing threads sharing the same key (importing more data later)
+  for(const nt of newThreads){
+    const existing=threads.find(t=>t.key===nt.key);
+    if(existing){
+      const seen=new Set(existing.messages.map(m=>m._id));
+      existing.messages.push(...nt.messages.filter(m=>!seen.has(m._id)));
+      existing.messages.sort((a,b)=>a.timestamp_ms-b.timestamp_ms);
+      nt.participants.forEach(p=>{if(!existing.participants.includes(p))existing.participants.push(p)});
+      existing.files.push(...nt.files);
+      existing.lastTs=existing.messages.length?existing.messages[existing.messages.length-1].timestamp_ms:0;
+    }else{
+      threads.push(nt);
+    }
+  }
+  threads.sort((a,b)=>b.lastTs-a.lastTs);
+  computeMeName();
+  loadBookmarks();
+  renderSidebar();
+  if(!activeKey && threads.length) selectThread(threads[0].key);
+  else if(activeKey) renderHeader(), renderMessages(true);
+}
+
+function computeMeName(){
+  const cover=new Map();
+  threads.forEach(t=>t.participants.forEach(p=>cover.set(p,(cover.get(p)||0)+1)));
+  let best=null,bestN=-1;
+  for(const [name,n] of cover){ if(n>bestN){best=name;bestN=n} }
+  if(best && (threads.length===1 || bestN>=Math.ceil(threads.length*0.6))) meName=best;
+  else{
+    const guess=[...cover.keys()].find(x=>/ผู้ใช้ instagram|your|คุณ/i.test(x));
+    meName=guess||[...cover.keys()][0]||null;
+  }
+}
+function effectiveMe(threadKey){ return meOverride.get(threadKey)||meName; }
+
+/* ============ import UI feedback ============ */
+function showImportProgress(label){
+  $("#messages").innerHTML=`<div class="empty-state"><div class="emoji">⏳</div><h2>${esc(label)}</h2><div class="progress"><div id="impBar"></div></div><p id="impText" style="margin-top:8px"></p></div>`;
+}
+function setImportProgress(frac,text){ const bar=$("#impBar"); if(bar)bar.style.width=(frac*100)+"%"; const t=$("#impText"); if(t)t.textContent=text; }
+function renderImportError(msg){ $("#messages").innerHTML=`<div class="empty-state"><div class="emoji">😕</div><h2>นำเข้าไม่สำเร็จ</h2><p>${esc(msg)}</p></div>`; renderSidebar(); }
+
+/* ============ bookmarks (persisted) ============ */
+function persistBookmarks(){ try{ localStorage.setItem("car-bookmarks-v2",JSON.stringify([...bookmarks])); }catch(e){} }
+function loadBookmarks(){ try{ bookmarks=new Set(JSON.parse(localStorage.getItem("car-bookmarks-v2")||"[]")); }catch(e){} }
+
+/* ============ sidebar ============ */
+function renderSidebar(){
+  if(activeTab==="import"){ renderImportPanel(); return; }
+  if(activeTab==="tools"){ renderToolsPanel(); return; }
+  renderChatList();
+}
+function renderImportPanel(){
+  $("#sbBody").innerHTML=`
+  <div class="import-card">
+    <div style="font-size:34px">📦</div>
+    <h3>เปิดไฟล์ ZIP export</h3>
+    <p>ลากไฟล์มาวางตรงนี้ได้เลย หรือเลือกไฟล์ ZIP ที่ได้จาก Instagram/Facebook โดยตรง ระบบจะดึงทั้งข้อความและรูป/วิดีโอ/เสียงในนั้นให้อัตโนมัติ</p>
+    <div class="import-actions">
+      <label class="pillbtn primary">📦 เลือกไฟล์ ZIP<input id="zipInput" type="file" accept=".zip" hidden></label>
+      <label class="pillbtn">📂 เลือกโฟลเดอร์ที่แตกแล้ว<input id="folderInput" type="file" webkitdirectory directory multiple hidden></label>
+      <label class="pillbtn">📄 เลือกไฟล์ JSON (ไม่มีสื่อ)<input id="jsonInput" type="file" multiple accept=".json" hidden></label>
+    </div>
+    <div class="dropzone-hint">ข้อมูลทั้งหมดประมวลผลในเครื่องนี้เท่านั้น • นำเข้าเพิ่มได้เรื่อยๆ ไม่ต้องเริ่มใหม่</div>
+  </div>
+  ${threads.length?`<div class="import-card" style="text-align:left"><h4 style="margin:0 0 6px;font-size:13px">นำเข้าแล้ว ${threads.length} แชต</h4><p style="margin:0">รวม ${threads.reduce((a,t)=>a+t.messages.length,0).toLocaleString()} ข้อความ • ไฟล์สื่อ ${mediaItems.length.toLocaleString()} รายการ</p></div>`:""}
+  `;
+  $("#zipInput").onchange=e=>{ const f=e.target.files[0]; if(f) loadZip(f); };
+  $("#folderInput").onchange=e=>{ if(e.target.files.length) loadFileList(e.target.files); };
+  $("#jsonInput").onchange=e=>{ if(e.target.files.length) loadFileList(e.target.files); };
+}
+function threadPreview(t){
+  const last=t.messages[t.messages.length-1];
+  if(!last)return"";
+  if(last.content)return last.content;
+  if(last.share?.link)return "🔗 แชร์โพสต์/Reel";
+  if(last.photos?.length)return "📷 รูปภาพ";
+  if(last.videos?.length)return "🎬 วิดีโอ";
+  if(last.audio_files?.length)return "🎧 ข้อความเสียง";
+  if(last.sticker)return "สติกเกอร์";
+  return "…";
+}
+function renderChatList(){
+  const q=threadSearch.trim().toLowerCase();
+  let list=threads;
+  if(q){
+    list=threads.filter(t=> t.title.toLowerCase().includes(q) || t.participants.some(p=>p.toLowerCase().includes(q)) || t.messages.some(m=>(m.content||"").toLowerCase().includes(q)) );
+  }
+  if(!threads.length){
+    $("#sbBody").innerHTML=`<div class="import-card"><div style="font-size:34px">👋</div><h3>ยินดีต้อนรับ</h3><p>ยังไม่มีแชตที่นำเข้า กดแท็บ “➕ นำเข้า” ด้านบนเพื่อเริ่มเปิดไฟล์ ZIP หรือโฟลเดอร์แชตที่กู้มา</p></div>`;
+    return;
+  }
+  if(!list.length){ $("#sbBody").innerHTML=`<div class="import-card"><p>ไม่พบแชตที่ตรงกับ “${esc(threadSearch)}”</p></div>`; return; }
+  $("#sbBody").innerHTML=list.map(t=>{
+    const isGroup=t.participants.length>2;
+    const other=t.participants.find(p=>p!==effectiveMe(t.key))||t.title;
+    const av=isGroup?`<div class="avatar a56 group" style="background:${gradFor(t.title)}"><span>${esc(initials(t.title))}</span></div>`:`<div class="avatar a56" style="background:${gradFor(other)}"><span>${esc(initials(other))}</span></div>`;
+    const bmN=t.messages.filter(m=>bookmarks.has(m._id)).length;
+    return `<div class="thread-row ${t.key===activeKey?"active":""}" data-key="${esc(t.key)}">
+      ${av}
+      <div class="meta">
+        <div class="row1"><span class="name">${esc(t.title)}</span><span class="time">${t.lastTs?esc(fmtShort(t.lastTs)):""}</span></div>
+        <div class="preview">${esc(threadPreview(t))}</div>
+      </div>
+      <span class="badge">${t.messages.length>999?"999+":t.messages.length}</span>
+    </div>`;
+  }).join("");
+  $$(".thread-row").forEach(r=>r.onclick=()=>selectThread(r.dataset.key));
+}
+
+function renderToolsPanel(){
+  const scope=activeKey?threads.find(t=>t.key===activeKey):null;
+  $("#sbBody").innerHTML=`
+  <div class="card"><h4>🧠 วิเคราะห์${scope?" แชตนี้":"ทั้งหมด"}</h4><p>สถิติและคำที่พบบ่อย ประมวลผลในเครื่อง ไม่ใช้ AI</p><button class="pillbtn primary" id="btnAnalyze" style="width:100%">วิเคราะห์ตอนนี้</button></div>
+  <div class="card"><h4>📅 Timeline</h4><p>จำนวนข้อความแยกตามเดือน</p><button class="pillbtn" id="btnTimeline" style="width:100%">เปิด Timeline</button></div>
+  <div class="card"><h4>⭐ บุ๊กมาร์ก (${bookmarks.size})</h4><p>ข้อความที่เก็บไว้ทั้งหมดทุกแชต</p><button class="pillbtn" id="btnExportBm" style="width:100%">ส่งออกเป็น TXT</button></div>
+  <div class="card"><h4>🔁 สลับฝั่ง “ฉัน”</h4><p>ถ้าระบบเดาผิดว่าใครคือคุณในแชตนี้ กดเพื่อเลือกใหม่</p>${scope?`<div class="who-row">${scope.participants.map(p=>`<button class="who-chip ${effectiveMe(scope.key)===p?"sel":""}" data-p="${esc(p)}">${esc(p)}</button>`).join("")}</div>`:`<p class="muted">เปิดแชตก่อนเพื่อตั้งค่า</p>`}</div>
+  <div class="card"><h4>🗑️ ล้างข้อมูล</h4><p>บุ๊กมาร์กเก็บใน browser นี้ ไฟล์แชตจะหายเมื่อปิดแท็บ</p><button class="pillbtn danger" id="btnClearBm" style="width:100%">ล้างบุ๊กมาร์กทั้งหมด</button></div>
+  <div class="card"><h4>🔐 ความเป็นส่วนตัว</h4><p>อ่าน/แตกไฟล์ทั้งหมดในเบราว์เซอร์ของคุณ ไม่มีการส่งข้อความหรือรูปออกจากเครื่อง</p></div>`;
+  $("#btnAnalyze").onclick=()=>analysisModal(scope);
+  $("#btnTimeline").onclick=()=>timelineModal(scope);
+  $("#btnExportBm").onclick=exportBookmarks;
+  $("#btnClearBm").onclick=()=>{ if(confirm("ล้างบุ๊กมาร์กทั้งหมด?")){ bookmarks.clear(); persistBookmarks(); renderSidebar(); renderMessages(true); } };
+  $$(".who-chip").forEach(c=>c.onclick=()=>{ meOverride.set(scope.key,c.dataset.p); renderSidebar(); renderHeader(); renderMessages(true); });
+}
+
+/* ============ thread selection & header ============ */
+function selectThread(key){
+  activeKey=key; renderedCount=PAGE;
+  document.body.classList.add("thread-open");
+  renderSidebar(); renderHeader(); renderFilters(); renderMessages(true);
+}
+function closeThread(){ document.body.classList.remove("thread-open"); }
+
+function renderHeader(){
+  const t=threads.find(x=>x.key===activeKey);
+  const head=$("#chatHeader");
+  if(!t){ head.classList.add("hidden"); $("#filtersBar").classList.add("hidden"); return; }
+  head.classList.remove("hidden");
+  const isGroup=t.participants.length>2;
+  const other=t.participants.find(p=>p!==effectiveMe(t.key))||t.title;
+  const av=isGroup?`<div class="avatar a44 group" style="background:${gradFor(t.title)}"><span>${esc(initials(t.title))}</span></div>`:`<div class="avatar a44" style="background:${gradFor(other)}"><span>${esc(initials(other))}</span></div>`;
+  head.innerHTML=`
+   <button class="iconbtn backbtn" id="backBtn">‹</button>
+   ${av}
+   <div class="titlewrap grow">
+     <div class="name">${esc(t.title)}</div>
+     <div class="sub">${isGroup?t.participants.length+" คน • ":""}${t.messages.length.toLocaleString()} ข้อความ</div>
+   </div>
+   <button class="iconbtn" id="filterToggle" title="ตัวกรอง">⚙</button>
+   <button class="iconbtn" id="threadToolsBtn" title="เครื่องมือ">🧰</button>`;
+  $("#backBtn").onclick=closeThread;
+  $("#filterToggle").onclick=()=>$("#filtersBar").classList.toggle("hidden");
+  $("#threadToolsBtn").onclick=()=>{ activeTab="tools"; setActiveTab(); };
+}
+function renderFilters(){
+  const t=threads.find(x=>x.key===activeKey);
+  const bar=$("#filtersBar");
+  if(!t){ bar.classList.add("hidden"); return; }
+  const isGroup=t.participants.length>2;
+  bar.innerHTML=`
+   <input id="msgSearch" type="search" placeholder="🔎 ค้นหาในแชตนี้" style="flex:1;min-width:160px;border:1px solid var(--line);border-radius:10px;padding:7px 10px;background:var(--soft);font-size:12.5px">
+   ${isGroup?`<select id="personSel"><option value="">ทุกคน</option>${t.participants.map(p=>`<option ${p===personFilter?"selected":""}>${esc(p)}</option>`).join("")}</select>`:""}
+   <select id="kindSel"><option value="">ทุกชนิด</option><option value="text">ข้อความ</option><option value="media">มีสื่อ</option><option value="share">แชร์โพสต์/Reel</option><option value="reaction">มี reaction</option><option value="bookmark">บุ๊กมาร์ก</option></select>
+   <input id="dateFromSel" type="date"><input id="dateToSel" type="date">
+   <button class="pillbtn" id="resetFilters">ล้างตัวกรอง</button>`;
+  $("#msgSearch").value=msgSearch; $("#kindSel").value=kindFilter; $("#dateFromSel").value=dateFrom; $("#dateToSel").value=dateTo;
+  $("#msgSearch").oninput=e=>{ msgSearch=e.target.value.trim().toLowerCase(); renderedCount=PAGE; renderMessages(true); };
+  const ps=$("#personSel"); if(ps) ps.onchange=e=>{ personFilter=e.target.value; renderedCount=PAGE; renderMessages(true); };
+  $("#kindSel").onchange=e=>{ kindFilter=e.target.value; renderedCount=PAGE; renderMessages(true); };
+  $("#dateFromSel").onchange=e=>{ dateFrom=e.target.value; renderedCount=PAGE; renderMessages(true); };
+  $("#dateToSel").onchange=e=>{ dateTo=e.target.value; renderedCount=PAGE; renderMessages(true); };
+  $("#resetFilters").onclick=()=>{ msgSearch="";kindFilter="";personFilter="";dateFrom="";dateTo="";renderedCount=PAGE;renderFilters();renderMessages(true); };
+}
+
+/* ============ filtering + rendering messages ============ */
+function typeMatch(m){
+  if(!kindFilter)return true;
+  if(kindFilter==="text")return !!m.content&&!hasMedia(m);
+  if(kindFilter==="media")return hasMedia(m);
+  if(kindFilter==="share")return !!m.share?.link;
+  if(kindFilter==="reaction")return !!(m.reactions&&m.reactions.length);
+  if(kindFilter==="bookmark")return bookmarks.has(m._id);
+  return true;
+}
+function filteredActive(){
+  const t=threads.find(x=>x.key===activeKey);
+  if(!t)return [];
+  const lo=dateFrom?new Date(dateFrom+"T00:00:00").getTime():-Infinity;
+  const hi_=dateTo?new Date(dateTo+"T23:59:59.999").getTime():Infinity;
+  return t.messages.filter(m=>{
+    if(personFilter&&m.sender_name!==personFilter)return false;
+    if(m.timestamp_ms<lo||m.timestamp_ms>hi_)return false;
+    if(!typeMatch(m))return false;
+    if(msgSearch){ const hay=[m.content,m.sender_name,m.share?.share_text,m.share?.link].filter(Boolean).join(" ").toLowerCase(); if(!hay.includes(msgSearch))return false; }
+    return true;
+  });
+}
+
+let io=null;
+function ensureObserver(){
+  if(io)return io;
+  io=new IntersectionObserver((entries)=>{
+    entries.forEach(en=>{
+      if(en.isIntersecting){
+        const el=en.target; io.unobserve(el);
+        hydrateThumb(el);
+      }
+    });
+  },{root:$("#messages"),rootMargin:"400px"});
+  return io;
+}
+async function hydrateThumb(el){
+  const uri=el.dataset.uri, mtype=el.dataset.mtype;
+  const url=await getMediaURL(uri);
+  el.classList.remove("skeleton");
+  if(!url){ el.innerHTML=`<div style="display:grid;place-items:center;height:100%;font-size:22px">${mtype==="video"?"🎬":"🖼️"}</div>`; return; }
+  if(mtype==="video"){ el.innerHTML=`<video src="${url}" muted preload="metadata"></video><div class="playicon">▶</div>`; }
+  else{ el.innerHTML=`<img src="${url}" loading="lazy" alt="">`; }
+  el.onclick=()=>openLightbox(url,mtype);
+}
+async function hydrateAudio(el){
+  const uri=el.dataset.uri;
+  const url=await getMediaURL(uri);
+  el.innerHTML = url? `<span style="font-size:18px">🎧</span><audio controls src="${url}"></audio>` : `<span style="font-size:18px">🎧</span><span class="muted" style="font-size:12px">ไม่พบไฟล์เสียงในข้อมูลที่นำเข้า</span>`;
+}
+
+function mediaGridHTML(m,mine){
+  const items=[];
+  (m.photos||[]).forEach(p=>items.push({uri:p.uri,type:"image"}));
+  (m.videos||[]).forEach(v=>items.push({uri:v.uri,type:"video"}));
+  (m.gifs||[]).forEach(g=>items.push({uri:g.uri,type:"image"}));
+  if(m.sticker?.uri)items.push({uri:m.sticker.uri,type:"image"});
+  if(!items.length)return "";
+  const show=items.slice(0,4), extra=items.length-4;
+  const n=Math.min(items.length,4);
+  const cells=show.map((it,i)=>{
+    const overlay= (i===3&&extra>0) ? `<div class="more">+${extra}</div>` : "";
+    return `<div class="mthumb skeleton" data-uri="${esc(it.uri)}" data-mtype="${it.type}">${overlay}</div>`;
+  }).join("");
+  return `<div class="media-grid n${n}">${cells}</div>`;
+}
+function audioHTML(m){
+  if(!m.audio_files||!m.audio_files.length)return "";
+  return m.audio_files.map(a=>`<div class="audio-card" data-uri="${esc(a.uri)}"><span style="font-size:18px">🎧</span><span class="muted" style="font-size:11.5px">กำลังโหลด…</span></div>`).join("");
+}
+function shareHTML(m,mine){
+  if(!m.share?.link)return "";
+  return `<div class="share-card">
+    <div class="sc-body">
+      <div class="sc-title">🔗 โพสต์ / Reel ที่แชร์</div>
+      ${m.share.share_text?`<div class="sc-text">${hi(m.share.share_text)}</div>`:""}
+    </div>
+    <a class="sc-link" href="${esc(m.share.link)}" target="_blank" rel="noopener">เปิดลิงก์ ↗</a>
+  </div>`;
+}
+function reactionsHTML(m){
+  if(!m.reactions||!m.reactions.length)return "";
+  const counts=new Map();
+  m.reactions.forEach(r=>{ const k=r.reaction||"👍"; if(!counts.has(k))counts.set(k,{n:0,actors:[]}); const o=counts.get(k); o.n++; o.actors.push(r.actor); });
+  return `<div class="reactions">${[...counts.entries()].map(([e,o])=>`<span class="reaction-pill" title="${esc(o.actors.join(', '))}">${esc(e)} ${o.n>1?o.n:""}</span>`).join("")}</div>`;
+}
+
+function renderMessages(resetScroll){
+  const t=threads.find(x=>x.key===activeKey);
+  const box=$("#messages");
+  if(!t){
+    box.innerHTML=`<div class="empty-state"><div class="emoji">📖</div><h2>เลือกแชตทางซ้าย</h2><p>เลือกการสนทนาที่ต้องการอ่านจากรายการแชต หรือกดแท็บ “➕ นำเข้า” หากยังไม่ได้เปิดไฟล์</p></div>`;
+    return;
+  }
+  const arr=filteredActive();
+  if(!arr.length){ box.innerHTML=`<div class="empty-state"><div class="emoji">🔍</div><h2>ไม่พบข้อความ</h2><p>ลองเปลี่ยนคำค้นหาหรือล้างตัวกรองดู</p></div>`; return; }
+
+  const slice=arr.slice(Math.max(0,arr.length-renderedCount));
+  const me=effectiveMe(t.key);
+  const isGroup=t.participants.length>2;
+  let html="", lastDay="", lastSender=null, lastTs=0;
+
+  if(arr.length>slice.length){
+    html+=`<div class="loadmore-wrap"><button class="pillbtn" id="loadMoreBtn">โหลดข้อความเก่ากว่านี้ (${(arr.length-slice.length).toLocaleString()})</button></div>`;
+  }
+
+  let groupOpen=false;
+  for(const m of slice){
+    const d=fmtDay(m.timestamp_ms);
+    if(d!==lastDay){ html+=`<div class="msg-inner"><div class="day-pill"><span>${esc(d)}</span></div></div>`; lastDay=d; lastSender=null; }
+    const mine = m.sender_name===me;
+    const sameGroup = lastSender===m.sender_name && (m.timestamp_ms-lastTs)<GROUP_GAP;
+    const bm=bookmarks.has(m._id);
+    const other=m.sender_name;
+
+    if(!sameGroup){
+      if(groupOpen) html+="</div></div></div>"; // close previous .col .group .msg-inner? handled below actually
+    }
+    // We build each message as its own group wrapper for simplicity & correctness (still visually grouped via tight spacing + hidden repeated avatar)
+    const showAvatar = !mine; // show avatar column for other person's messages
+    const avatarHTML = (!sameGroup && showAvatar) ? `<div class="avatar a28" style="background:${gradFor(other)}"><span>${esc(initials(other))}</span></div>` : "";
+    const gutter = showAvatar ? `<div class="gutter">${avatarHTML}</div>` : "";
+    const nameLabel = (isGroup && !mine && !sameGroup) ? `<div class="sender-label">${esc(other)}</div>` : "";
+
+    const bodyParts=[];
+    if(m.content) bodyParts.push(`<div>${hi(m.content)}</div>`);
+    const media=mediaGridHTML(m,mine); if(media) bodyParts.push(media);
+    const aud=audioHTML(m); if(aud) bodyParts.push(aud);
+    const sh=shareHTML(m,mine); if(sh) bodyParts.push(sh);
+    if(m.call_duration!=null) bodyParts.push(`<div style="font-size:12.5px">📞 การโทร ${Math.round(m.call_duration)} วินาที</div>`);
+    if(!bodyParts.length) bodyParts.push(`<div class="muted" style="font-size:12.5px">(ไม่มีเนื้อหาที่แสดงได้)</div>`);
+
+    const bareMedia = !m.content && (media||aud) && !sh;
+    html+=`<div class="msg-inner"><div class="group ${mine?"mine":""}">
+      ${gutter}
+      <div class="col">
+        ${nameLabel}
+        <div class="bubble-row">
+          <button class="star-btn ${bm?"on":""}" data-id="${esc(m._id)}">${bm?"⭐":"☆"}</button>
+          <div class="bubble ${bareMedia?"tight":""}">${bodyParts.join("")}</div>
+        </div>
+        ${reactionsHTML(m)}
+        <div class="msg-time" style="align-self:${mine?"flex-end":"flex-start"}">${fmtTime(m.timestamp_ms)}</div>
+      </div>
+    </div></div>`;
+    lastSender=m.sender_name; lastTs=m.timestamp_ms;
+  }
+
+  const prevScrollHeight=box.scrollHeight, prevScrollTop=box.scrollTop;
+  box.innerHTML=html;
+
+  $$(".mthumb").forEach(el=>ensureObserver().observe(el));
+  $$(".audio-card").forEach(el=>hydrateAudio(el));
+  $$(".star-btn").forEach(b=>b.onclick=()=>{
+    const id=b.dataset.id;
+    if(bookmarks.has(id))bookmarks.delete(id); else bookmarks.add(id);
+    persistBookmarks(); b.classList.toggle("on"); b.textContent=bookmarks.has(id)?"⭐":"☆";
+    if(activeTab==="tools")renderToolsPanel();
+  });
+  const lm=$("#loadMoreBtn");
+  if(lm) lm.onclick=()=>{ renderedCount+=PAGE; renderMessages(false); };
+
+  if(resetScroll){ box.scrollTop=box.scrollHeight; }
+  else{ box.scrollTop = box.scrollHeight-prevScrollHeight+prevScrollTop; }
+}
+
+/* ============ lightbox ============ */
+function openLightbox(url,type){
+  const lb=$("#lightbox");
+  lb.innerHTML=`<button class="lb-close" id="lbClose">✕</button><a class="lb-dl" href="${url}" download title="ดาวน์โหลด">⬇</a>${type==="video"?`<video src="${url}" controls autoplay></video>`:`<img src="${url}" alt="">`}`;
+  lb.classList.remove("hidden");
+  $("#lbClose").onclick=()=>lb.classList.add("hidden");
+  lb.onclick=e=>{ if(e.target.id==="lightbox")lb.classList.add("hidden"); };
+}
+
+/* ============ modal / analysis / timeline / export ============ */
+function openModal(title,body){ $("#modalTitle").textContent=title; $("#modalBody").innerHTML=body; $("#modal").classList.remove("hidden"); }
+function closeModal(){ $("#modal").classList.add("hidden"); }
+
+function analysisModal(scopeThread){
+  const arr = scopeThread ? scopeThread.messages : threads.flatMap(t=>t.messages);
+  if(!arr.length){ openModal("🧠 วิเคราะห์","ไม่มีข้อมูล"); return; }
+  const counts={}; arr.forEach(m=>counts[m.sender_name]=(counts[m.sender_name]||0)+1);
+  const media=arr.filter(hasMedia).length, shares=arr.filter(m=>m.share?.link).length;
+  const days={}; arr.forEach(m=>{ const d=new Date(m.timestamp_ms).toISOString().slice(0,10); days[d]=(days[d]||0)+1; });
+  const topDays=Object.entries(days).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const keywords=["รัก","คิดถึง","เลิก","ห่าง","ทะเลาะ","งอน","ขอโทษ","งาน","เรียน","ฝึกงาน","กินข้าว","นอน","โทร","เจอกัน","เงิน","ครอบครัว"];
+  const hits=keywords.map(k=>[k,arr.filter(m=>(m.content||"").toLowerCase().includes(k)).length]).filter(x=>x[1]).sort((a,b)=>b[1]-a[1]);
+  openModal(scopeThread?`🧠 วิเคราะห์: ${scopeThread.title}`:"🧠 วิเคราะห์ทุกแชต", `
+   <div class="grid2" style="margin:0 0 10px">
+    <div class="stat-big"><div class="n">${arr.length.toLocaleString()}</div><div class="l">ข้อความ</div></div>
+    <div class="stat-big"><div class="n">${media.toLocaleString()}</div><div class="l">มีสื่อ/ไฟล์แนบ</div></div>
+    <div class="stat-big"><div class="n">${shares.toLocaleString()}</div><div class="l">แชร์โพสต์/Reel</div></div>
+    <div class="stat-big"><div class="n">${arr.filter(m=>bookmarks.has(m._id)).length}</div><div class="l">บุ๊กมาร์ก</div></div>
+   </div>
+   <div class="card" style="margin:0 0 10px"><h4>จำนวนข้อความแยกตามคน</h4>${Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(([p,n])=>`<div class="statline"><span>${esc(p)}</span><b>${n.toLocaleString()}</b></div>`).join("")}</div>
+   <div class="card" style="margin:0 0 10px"><h4>คำที่พบบ่อยจากชุดคำที่ระบบตรวจ</h4><div>${hits.map(([k,n])=>`<span class="chip">${esc(k)} ${n}</span>`).join("")||"ไม่พบ"}</div></div>
+   <div class="card" style="margin:0"><h4>วันที่มีข้อความมากที่สุด</h4>${topDays.map(([d,n])=>`<div class="statline"><span>${new Date(d+"T12:00:00").toLocaleDateString("th-TH",{dateStyle:"long"})}</span><b>${n}</b></div>`).join("")}</div>
+   <p class="muted" style="font-size:11.5px;margin-top:10px">หมายเหตุ: เป็นสถิติและการค้นคำแบบ local ไม่ใช่การวิเคราะห์โดย AI และไม่ควรตีความจำนวนข้อความเป็นตัวชี้วัดความรู้สึกหรือความสัมพันธ์โดยตรง</p>`);
+}
+function timelineModal(scopeThread){
+  const arr = scopeThread ? scopeThread.messages : threads.flatMap(t=>t.messages);
+  const months={}; arr.forEach(m=>{ const k=new Date(m.timestamp_ms).toISOString().slice(0,7); months[k]=(months[k]||0)+1; });
+  const rows=Object.entries(months).sort((a,b)=>a[0]<b[0]?1:-1);
+  openModal(scopeThread?`📅 Timeline: ${scopeThread.title}`:"📅 Timeline ทุกแชต",
+    rows.length? rows.map(([k,n])=>`<div class="statline"><span>${new Date(k+"-15T12:00:00").toLocaleDateString("th-TH",{year:"numeric",month:"long"})}</span><b>${n.toLocaleString()}</b></div>`).join("") : "ไม่มีข้อมูล");
+}
+function exportBookmarks(){
+  const arr=threads.flatMap(t=>t.messages.filter(m=>bookmarks.has(m._id)).map(m=>({...m,_thread:t.title})));
+  if(!arr.length){ alert("ยังไม่มีบุ๊กมาร์ก"); return; }
+  arr.sort((a,b)=>a.timestamp_ms-b.timestamp_ms);
+  const text=arr.map(m=>`[${m._thread}] ${new Date(m.timestamp_ms).toLocaleString("th-TH",{dateStyle:"medium",timeStyle:"short"})} — ${m.sender_name}\n${m.content||""}${m.share?.link?"\n"+m.share.link:""}\n`).join("\n");
+  const blob=new Blob([text],{type:"text/plain;charset=utf-8"}), a=document.createElement("a");
+  a.href=URL.createObjectURL(blob); a.download="chat-bookmarks.txt"; a.click(); URL.revokeObjectURL(a.href);
+}
+
+/* ============ tabs / theme / global wiring ============ */
+function setActiveTab(){
+  $$(".sb-tab").forEach(b=>b.classList.remove("active"));
+  ({chats:$("#tabChats"),tools:$("#tabTools"),import:$("#tabImport")}[activeTab]).classList.add("active");
+  renderSidebar();
+}
+$("#tabChats").onclick=()=>{ activeTab="chats"; setActiveTab(); };
+$("#tabTools").onclick=()=>{ activeTab="tools"; setActiveTab(); };
+$("#tabImport").onclick=()=>{ activeTab="import"; setActiveTab(); };
+$("#threadSearch").oninput=e=>{ threadSearch=e.target.value; if(activeTab!=="chats"){activeTab="chats";setActiveTab();}else renderChatList(); };
+$("#themeBtn").onclick=()=>{ document.body.classList.toggle("dark"); try{localStorage.setItem("car-theme",document.body.classList.contains("dark")?"dark":"light")}catch(e){} $("#themeBtn").textContent=document.body.classList.contains("dark")?"☀":"☾"; };
+$("#helpBtn").onclick=()=>openModal("❓ วิธีใช้",`<ol style="padding-left:18px;line-height:1.8">
+ <li>กดแท็บ <b>➕ นำเข้า</b> แล้วเลือกไฟล์ ZIP ที่ดาวน์โหลดจาก Instagram/Facebook (แนะนำ เพราะดึงรูป/วิดีโอ/เสียงมาแสดงในแชตได้ด้วย)</li>
+ <li>หรือแตก ZIP เองก่อน แล้วเลือก “โฟลเดอร์ที่แตกแล้ว” ทั้งโฟลเดอร์ (รวมรูป/วิดีโอ) ระบบจะจับคู่สื่อกับข้อความให้อัตโนมัติ</li>
+ <li>เลือกไฟล์ JSON เดี่ยวๆ ได้เช่นกัน แต่จะไม่มีรูป/วิดีโอประกอบ</li>
+ <li>แชตแต่ละอันจะถูกจัดกลุ่มให้อัตโนมัติเหมือนหน้าแชต แตะเพื่อเปิดอ่าน</li>
+ <li>ใช้ ⚙ ในหน้าแชตเพื่อค้นหา/กรองตามช่วงเวลาหรือชนิดข้อความ กด ☆ เพื่อบุ๊กมาร์กข้อความสำคัญ</li>
+ <li>ถ้าฝั่งข้อความของ “ฉัน” สลับผิดฝั่ง ไปที่แท็บ 🧰 เครื่องมือ แล้วเลือกใหม่ในหัวข้อ “สลับฝั่ง”</li>
+</ol>
+<p class="muted" style="font-size:12px">ทุกอย่างประมวลผลในเบราว์เซอร์นี้ ไม่มีการอัปโหลดแชตหรือรูปไปเซิร์ฟเวอร์ใดๆ (ยกเว้นการโหลดตัวช่วยแตก ZIP จาก CDN ครั้งแรกที่ใช้งาน)</p>`);
+$("#modalClose").onclick=closeModal;
+$("#modal").onclick=e=>{ if(e.target.id==="modal")closeModal(); };
+
+$("#messages").addEventListener("scroll",()=>{
+  const box=$("#messages");
+  if(box.scrollTop<80){
+    const t=threads.find(x=>x.key===activeKey);
+    if(t){ const arr=filteredActive(); if(arr.length>renderedCount){ /* handled via button to avoid jank-loops; keep manual */ } }
+  }
+});
+
+/* drag & drop zip anywhere */
+["dragover","drop"].forEach(ev=>window.addEventListener(ev,e=>e.preventDefault()));
+window.addEventListener("drop",e=>{
+  const f=[...(e.dataTransfer?.files||[])];
+  if(!f.length)return;
+  if(f.length===1 && /\.zip$/i.test(f[0].name)){ activeTab="import"; setActiveTab(); loadZip(f[0]); }
+  else{ activeTab="import"; setActiveTab(); loadFileList(f); }
+});
+
+/* init */
+try{ if(localStorage.getItem("car-theme")==="dark"){ document.body.classList.add("dark"); $("#themeBtn").textContent="☀"; } }catch(e){}
+loadBookmarks();
+activeTab="import"; setActiveTab();
+</script>
+</body>
+</html>
