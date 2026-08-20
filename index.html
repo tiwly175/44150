@@ -696,7 +696,9 @@ function ensureObserver(){
         hydrateThumb(el);
       }
     });
-  },{root:$("#messages"),rootMargin:"400px"});
+  },{root:null,rootMargin:"600px"}); // root:null (viewport) works correctly for thumbs inside
+    // #messages AND inside the gallery modal's own scroll container (#modalBody) — a scoped
+    // root only works for descendants of that root, so the gallery grid never hydrated before.
   return io;
 }
 async function hydrateThumb(el){
