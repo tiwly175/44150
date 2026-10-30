@@ -92,7 +92,7 @@ aside.sidebar{background:var(--sidebar);border-right:1px solid var(--line);displ
 .chip{display:inline-block;background:var(--soft);border-radius:999px;padding:5px 10px;font-size:11.5px;margin:2px}
 
 /* ---------- Main / chat panel ---------- */
-main.chatpane{display:flex;flex-direction:column;min-width:0;background:var(--bg)}
+main.chatpane{display:flex;flex-direction:column;min-width:0;background:var(--bg);position:relative}
 .chat-header{flex:none;display:flex;align-items:center;gap:10px;padding:10px 18px;border-bottom:1px solid var(--line);background:color-mix(in srgb,var(--panel) 92%,transparent);backdrop-filter:blur(14px);position:sticky;top:0;z-index:5}
 .chat-header .titlewrap{min-width:0}
 .chat-header .name{font-weight:800;font-size:15px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -123,9 +123,7 @@ main.chatpane{display:flex;flex-direction:column;min-width:0;background:var(--bg
 .bubble.tight{padding:4px}
 .bubble .caption{padding:6px 6px 2px;font-size:13.5px}
 
-.msg-time{font-size:10px;color:var(--muted);opacity:0;transition:opacity .12s;white-space:nowrap;padding:0 3px 4px}
-.bubble-row:hover .msg-time{opacity:1}
-
+.msg-time{font-size:10px;color:var(--muted);opacity:0;transition:opacity .12s;white-space:nowrap;padding:0 3px}
 .star-btn{opacity:0;width:26px;height:26px;border:0;background:var(--panel);border-radius:50%;display:grid;place-items:center;font-size:13px;box-shadow:var(--shadow);transition:opacity .12s;flex:none;align-self:center}
 .bubble-row:hover .star-btn{opacity:1}
 .star-btn.on{opacity:1;color:#f5a623}
@@ -170,12 +168,44 @@ main.chatpane{display:flex;flex-direction:column;min-width:0;background:var(--bg
 .tag-chip-filter{display:inline-flex;align-items:center;gap:5px;background:var(--soft);border-radius:999px;padding:6px 11px;font-size:12px;font-weight:700;cursor:pointer;margin:3px}
 .tag-chip-filter.sel{background:#7C4DFF17;color:var(--g1)}
 
+.muted{color:var(--muted)}
+.mthumb .missing{display:grid;place-items:center;align-content:center;gap:2px;height:100%;color:var(--muted);text-align:center;padding:4px}
+.mthumb .missing span{font-size:22px}
+.mthumb .missing small{font-size:10px}
+.notice{margin:8px 0 4px;padding:10px 12px;border-radius:12px;background:#FFB84D22;border:1px solid #FFB84D55;font-size:12.5px;line-height:1.5}
+.jump-bottom{position:absolute;right:18px;bottom:16px;width:42px;height:42px;border-radius:50%;border:0;background:var(--panel);box-shadow:var(--shadow);font-size:18px;z-index:4}
+.chatwrap{position:relative;flex:1;min-height:0;display:flex;flex-direction:column}
+.flash .bubble{animation:flash 1.6s ease}
+@keyframes flash{0%,60%{box-shadow:0 0 0 3px #FFB84D}100%{box-shadow:var(--shadow)}}
+.lb-nav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;background:#ffffff22;color:#fff;border:0;font-size:22px}
+.lb-nav.prev{left:14px}.lb-nav.next{right:14px}
+.unsent{font-style:italic;opacity:.7;font-size:13px}
+.bm-item{padding:10px 12px;border:1px solid var(--line);border-radius:12px;margin-bottom:8px;cursor:pointer;font-size:13.5px}
+.bm-item:hover{background:var(--soft)}
+.bm-meta{font-size:11px;color:var(--muted);margin-bottom:3px}
+.hit{padding:9px 8px;border-radius:12px;cursor:pointer;font-size:12.5px}
+.hit:hover{background:var(--soft)}
+.hit b{font-size:11px;color:var(--muted);display:block;margin-bottom:2px;font-weight:700}
+.sec-label{font-size:11px;font-weight:800;color:var(--muted);padding:10px 8px 4px;letter-spacing:.04em}
+.hover-actions{display:flex;align-items:center;gap:4px;align-self:center}
+.group.mine .hover-actions{flex-direction:row-reverse}
+.hover-actions .star-btn,.hover-actions .tag-add-btn{opacity:0}
+.bubble-row:hover .hover-actions .star-btn,.bubble-row:hover .hover-actions .tag-add-btn,.hover-actions .star-btn.on{opacity:1}
+.hover-actions .tag-add-btn{width:26px;height:26px;border:0;background:var(--panel);border-radius:50%;box-shadow:var(--shadow);font-size:12px;color:inherit}
+.bubble-row:hover .msg-time{opacity:1}
+@media(hover:none){.hover-actions .star-btn,.hover-actions .tag-add-btn{opacity:.55}.msg-time{opacity:.8 !important}}
+.group{align-items:flex-end}
+.group .gutter{align-self:flex-end}
+footer.foot{display:none}
+.bubble.emoji{background:none !important;box-shadow:none;font-size:38px;padding:0 2px;line-height:1.2}
+.bubble a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+.hover-actions .tag-add-btn[data-ctx]{opacity:0}
 /* gallery */
 .gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:4px}
 .gallery-grid .mthumb{aspect-ratio:1/1;border-radius:8px}
 
 /* message enter animation */
-.msg-inner{animation:msgIn .22s ease}
+.msg-inner.anim{animation:msgIn .22s ease}
 @keyframes msgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 .thread-row,.chat-header,.bubble{transition:background .15s}
 main.chatpane{animation:paneIn .18s ease}
@@ -224,12 +254,6 @@ footer.foot{position:fixed;bottom:0;right:0;font-size:10px;color:var(--muted);pa
   .msg-inner{padding:0 10px}
 }
 @media(prefers-reduced-motion:reduce){*{animation-duration:.001ms !important;transition-duration:.001ms !important}}
-
-/* touch devices have no :hover, so reveal-on-hover controls must stay visible or they're unreachable */
-@media(hover:none){
-  .star-btn,.tag-add-btn{opacity:.65}
-  .msg-time{opacity:.7}
-}
 </style>
 </head>
 <body>
@@ -263,6 +287,7 @@ footer.foot{position:fixed;bottom:0;right:0;font-size:10px;color:var(--muted);pa
       <h2>ยังไม่ได้เปิดแชตไหน</h2>
       <p>นำเข้าไฟล์ ZIP ที่ export มา หรือเลือกโฟลเดอร์ที่แตกไว้แล้ว จากแท็บ “นำเข้า” ทางซ้าย จากนั้นเลือกแชตที่ต้องการอ่านได้เลย</p>
     </div></div>
+    <button class="jump-bottom hidden" id="jumpBottom" title="ไปข้อความล่าสุด">↓</button>
   </main>
 </div>
 
@@ -317,6 +342,10 @@ function repair(s){if(typeof s!=="string"||repairScore(s)<2)return s;let b=s,bs=
 function deep(x){if(typeof x==="string")return repair(x);if(Array.isArray(x))return x.map(deep);if(x&&typeof x==="object"){const o={};for(const k in x)o[k]=deep(x[k]);return o}return x}
 function esc(s){return String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
 function hi(s){const t=esc(s);if(!msgSearch)return t;const z=msgSearch.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");return t.split(new RegExp("("+z+")","ig")).map((x,i)=>i%2?`<mark>${x}</mark>`:x).join("")}
+function linkify(escaped){ return escaped.replace(/(https?:\/\/[^\s<]+)/g,u=>{ const clean=u.replace(/[).,!?]+$/,""); const tail=u.slice(clean.length); return `<a href="${clean}" target="_blank" rel="noopener">${clean}</a>${tail}`; }); }
+function isEmojiOnly(t){ const x=(t||"").trim(); return !!x && x.length<=24 && /^(?:\p{Extended_Pictographic}|\p{Emoji_Modifier}|\u200d|\ufe0f|\s)+$/u.test(x) && [...x.replace(/\s/g,"")].length<=8; }
+function msgHTML(c){ return msgSearch?hi(c):linkify(esc(c)); }
+function filtersActive(){ return !!(msgSearch||kindFilter||personFilter||dateFrom||dateTo||tagFilter); }
 function fmtTime(t){return new Date(t).toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"})}
 function fmtDay(t){return new Date(t).toLocaleDateString("th-TH",{dateStyle:"long"})}
 function fmtShort(t){const d=new Date(t),now=new Date();const sameDay=d.toDateString()===now.toDateString();if(sameDay)return fmtTime(t);const diffDays=Math.round((now-d)/86400000);if(diffDays<7)return d.toLocaleDateString("th-TH",{weekday:"short"});return d.toLocaleDateString("th-TH",{day:"numeric",month:"short"})}
@@ -357,27 +386,42 @@ async function getMediaURL(uri){
 }
 
 /* ============ import: zip ============ */
-async function loadZip(file){
+async function getJSZip(){ return (typeof JSZip!=="undefined")?JSZip:(window.JSZip||null); }
+async function loadZips(files){
+  files=[...files];
   showImportProgress("กำลังเปิด ZIP...");
-  if(typeof JSZip==="undefined"){ renderImportError("ตัวช่วยแตก ZIP ไม่พร้อมใช้งานในหน้านี้ ลองโหลดหน้าเว็บใหม่ หรือแตก ZIP เองแล้วเลือกโฟลเดอร์แทน"); return; }
-  let zip;
-  try{ zip=await JSZip.loadAsync(file); }catch(e){ renderImportError("เปิดไฟล์ ZIP ไม่สำเร็จ ไฟล์อาจเสียหรือไม่ใช่ ZIP"); return; }
-
-  const entries=Object.entries(zip.files).filter(([,o])=>!o.dir);
+  const JSZip=await getJSZip();
+  if(!JSZip){ renderImportError("ตัวช่วยแตก ZIP ไม่พร้อมใช้งาน ลองแตก ZIP เองแล้วเลือกเป็นโฟลเดอร์แทน"); return; }
   const msgFiles=[]; let mediaCount=0;
-  let i=0;
-  for(const [name,obj] of entries){
-    i++;
-    const base=name.split("/").pop();
-    if(/message(_\d+)?\.json$/i.test(base)){
-      try{ const text=await obj.async("string"); msgFiles.push({path:name,data:deep(JSON.parse(text))}); }catch(e){}
-    }else{
-      addMediaItem(name,"zip",obj); mediaCount++;
+  for(let fi=0;fi<files.length;fi++){
+    const file=files[fi];
+    let zip;
+    try{ zip=await JSZip.loadAsync(file); }
+    catch(e){ renderImportError("เปิดไฟล์ ZIP “"+file.name+"” ไม่สำเร็จ ไฟล์อาจเสียหรือใหญ่เกินกว่าที่เบราว์เซอร์จะเปิดได้ (ถ้าไฟล์ใหญ่มาก แนะนำให้แตก ZIP แล้วเลือกเป็นโฟลเดอร์แทน)"); return; }
+    const entries=Object.entries(zip.files).filter(([,o])=>!o.dir);
+    let i=0;
+    for(const [name,obj] of entries){
+      i++;
+      const base=name.split("/").pop();
+      if(/^message(_\d+)?\.json$/i.test(base)){
+        try{ const text=await obj.async("string"); const data=JSON.parse(text); if(Array.isArray(data.messages)) msgFiles.push({path:name,data:deep(data)}); }catch(e){}
+      }else if(!/\.(html|htm|txt)$/i.test(base)){
+        addMediaItem(name,"zip",obj); mediaCount++;
+      }
+      if(i%40===0){ setImportProgress((fi+i/entries.length)/files.length,`ไฟล์ ${fi+1}/${files.length} • ${i.toLocaleString()}/${entries.length.toLocaleString()} รายการ`); await new Promise(r=>setTimeout(r,0)); }
     }
-    if(i%40===0)setImportProgress(i/entries.length,`${i.toLocaleString()}/${entries.length.toLocaleString()} รายการ`);
   }
-  if(!msgFiles.length){ renderImportError("หา message_*.json ไม่เจอในไฟล์นี้ อาจไม่ใช่รูปแบบ export ที่รองรับ"); return; }
+  if(!msgFiles.length){
+    if(mediaCount){ afterImportNoMessages(mediaCount); return; }
+    renderImportError("หา message_*.json ไม่เจอในไฟล์นี้ อาจไม่ใช่รูปแบบ export ที่รองรับ"); return;
+  }
   finishImport(msgFiles);
+}
+function loadZip(file){ return loadZips([file]); }
+function afterImportNoMessages(mediaCount){
+  activeTab="chats"; setActiveTab();
+  $("#messages").innerHTML=`<div class="empty-state"><div class="emoji">🖼️</div><h2>เพิ่มไฟล์สื่อแล้ว ${mediaCount.toLocaleString()} รายการ</h2><p>ZIP นี้มีแต่รูป/วิดีโอ/เสียง ไม่มีไฟล์ข้อความ ถ้านำเข้าแชต (message_*.json) แล้ว รูปจะถูกจับคู่ให้อัตโนมัติ เปิดแชตเพื่อดูได้เลย</p></div>`;
+  if(activeKey){ renderHeader(); renderMessages(false); }
 }
 
 /* ============ import: folder / plain json files ============ */
@@ -395,7 +439,10 @@ async function loadFileList(fileList){
     }
     if(i%25===0)setImportProgress(i/files.length,`${i}/${files.length} ไฟล์`);
   }
-  if(!msgFiles.length){ renderImportError("ไม่พบไฟล์ JSON ของแชตในสิ่งที่เลือก (ต้องเป็น message_*.json)"); return; }
+  if(!msgFiles.length){
+    if(mediaItems.length){ afterImportNoMessages(mediaItems.length); return; }
+    renderImportError("ไม่พบไฟล์ JSON ของแชตในสิ่งที่เลือก (ต้องเป็น message_*.json)"); return;
+  }
   finishImport(msgFiles);
 }
 
@@ -415,7 +462,8 @@ function finishImport(msgFiles){
       timestamp_ms:+m.timestamp_ms||0,
       photos:m.photos||null, videos:m.videos||null, audio_files:m.audio_files||null,
       gifs:m.gifs||null, sticker:m.sticker||null,
-      share:m.share?{link:m.share.link,share_text:m.share.share_text?repair(m.share.share_text):""}:null,
+      share:m.share?{link:m.share.link,share_text:m.share.share_text?repair(m.share.share_text):"",owner:m.share.original_content_owner?repair(m.share.original_content_owner):""}:null,
+      is_unsent:!!m.is_unsent,
       reactions:(m.reactions||[]).map(r=>({reaction:repair(r.reaction||""),actor:repair(r.actor||"")})),
       call_duration: m.call_duration ?? null,
       _id:key+"#"+path+"#"+idx
@@ -447,21 +495,24 @@ function finishImport(msgFiles){
   threads.sort((a,b)=>b.lastTs-a.lastTs);
   computeMeName();
   loadBookmarks(); loadTags();
-  renderSidebar();
+  activeTab="chats"; setActiveTab();
   if(!activeKey && threads.length) selectThread(threads[0].key);
-  else if(activeKey) renderHeader(), renderMessages(true);
+  else if(activeKey){ renderHeader(); renderFilters(); renderMessages(true); }
 }
 
 function computeMeName(){
-  const cover=new Map();
-  threads.forEach(t=>t.participants.forEach(p=>cover.set(p,(cover.get(p)||0)+1)));
-  let best=null,bestN=-1;
-  for(const [name,n] of cover){ if(n>bestN){best=name;bestN=n} }
-  if(best && (threads.length===1 || bestN>=Math.ceil(threads.length*0.6))) meName=best;
-  else{
-    const guess=[...cover.keys()].find(x=>/ผู้ใช้ instagram|your|คุณ/i.test(x));
-    meName=guess||[...cover.keys()][0]||null;
-  }
+  const votes=new Map(), cover=new Map();
+  threads.forEach(t=>{
+    t.participants.forEach(p=>cover.set(p,(cover.get(p)||0)+1));
+    if(t.participants.length===2 && t.participants.includes(t.title)){
+      const me=t.participants.find(p=>p!==t.title); votes.set(me,(votes.get(me)||0)+1);
+    }
+  });
+  let best=null,bn=0; for(const [n,c] of votes){ if(c>bn){best=n;bn=c} }
+  if(best){ meName=best; return; }
+  let b2=null,n2=-1; for(const [n,c] of cover){ if(c>n2){b2=n;n2=c} }
+  if(b2 && (threads.length===1 || n2>=Math.ceil(threads.length*0.6))) meName=b2;
+  else meName=[...cover.keys()].find(x=>/ผู้ใช้ instagram|your|คุณ/i.test(x))||[...cover.keys()][0]||null;
 }
 function effectiveMe(threadKey){ return meOverride.get(threadKey)||meName; }
 
@@ -494,7 +545,7 @@ function renderImportPanel(){
     <h3>เปิดไฟล์ ZIP export</h3>
     <p>ลากไฟล์มาวางตรงนี้ได้เลย หรือเลือกไฟล์ ZIP ที่ได้จาก Instagram/Facebook โดยตรง ระบบจะดึงทั้งข้อความและรูป/วิดีโอ/เสียงในนั้นให้อัตโนมัติ</p>
     <div class="import-actions">
-      <label class="pillbtn primary">📦 เลือกไฟล์ ZIP<input id="zipInput" type="file" accept=".zip" hidden></label>
+      <label class="pillbtn primary">📦 เลือกไฟล์ ZIP<input id="zipInput" type="file" accept=".zip" multiple hidden></label>
       <label class="pillbtn">📂 เลือกโฟลเดอร์ที่แตกแล้ว<input id="folderInput" type="file" webkitdirectory directory multiple hidden></label>
       <label class="pillbtn">📄 เลือกไฟล์ JSON (ไม่มีสื่อ)<input id="jsonInput" type="file" multiple accept=".json" hidden></label>
     </div>
@@ -502,7 +553,7 @@ function renderImportPanel(){
   </div>
   ${threads.length?`<div class="import-card" style="text-align:left"><h4 style="margin:0 0 6px;font-size:13px">นำเข้าแล้ว ${threads.length} แชต</h4><p style="margin:0">รวม ${threads.reduce((a,t)=>a+t.messages.length,0).toLocaleString()} ข้อความ • ไฟล์สื่อ ${mediaItems.length.toLocaleString()} รายการ</p></div>`:""}
   `;
-  $("#zipInput").onchange=e=>{ const f=e.target.files[0]; if(f) loadZip(f); };
+  $("#zipInput").onchange=e=>{ if(e.target.files.length) loadZips(e.target.files); };
   $("#folderInput").onchange=e=>{ if(e.target.files.length) loadFileList(e.target.files); };
   $("#jsonInput").onchange=e=>{ if(e.target.files.length) loadFileList(e.target.files); };
 }
@@ -510,6 +561,7 @@ function threadPreview(t){
   const last=t.messages[t.messages.length-1];
   if(!last)return"";
   if(last.content)return last.content;
+  if(last.is_unsent)return "ยกเลิกการส่งข้อความ";
   if(last.share?.link)return "🔗 แชร์โพสต์/Reel";
   if(last.photos?.length)return "📷 รูปภาพ";
   if(last.videos?.length)return "🎬 วิดีโอ";
@@ -527,8 +579,14 @@ function renderChatList(){
     $("#sbBody").innerHTML=`<div class="import-card"><div style="font-size:34px">👋</div><h3>ยินดีต้อนรับ</h3><p>ยังไม่มีแชตที่นำเข้า กดแท็บ “➕ นำเข้า” ด้านบนเพื่อเริ่มเปิดไฟล์ ZIP หรือโฟลเดอร์แชตที่กู้มา</p></div>`;
     return;
   }
-  if(!list.length){ $("#sbBody").innerHTML=`<div class="import-card"><p>ไม่พบแชตที่ตรงกับ “${esc(threadSearch)}”</p></div>`; return; }
-  $("#sbBody").innerHTML=list.map(t=>{
+  let hitsHTML="";
+  if(q.length>=2){
+    const hits=[];
+    outer: for(const t of threads){ for(let i=t.messages.length-1;i>=0;i--){ const m=t.messages[i]; if((m.content||"").toLowerCase().includes(q)){ hits.push({t,m}); if(hits.length>=40)break outer; } } }
+    if(hits.length) hitsHTML=`<div class="sec-label">ข้อความที่ตรงกัน</div>`+hits.map(({t,m})=>`<div class="hit" data-k="${esc(t.key)}" data-id="${esc(m._id)}"><b>${esc(t.title)} · ${esc(new Date(m.timestamp_ms).toLocaleDateString("th-TH",{dateStyle:"medium"}))}</b>${esc(snippet(m))}</div>`).join("");
+  }
+  if(!list.length && !hitsHTML){ $("#sbBody").innerHTML=`<div class="import-card"><p>ไม่พบแชตที่ตรงกับ “${esc(threadSearch)}”</p></div>`; return; }
+  $("#sbBody").innerHTML=(list.length&&hitsHTML?`<div class="sec-label">แชต</div>`:"")+list.map(t=>{
     const isGroup=t.participants.length>2;
     const other=t.participants.find(p=>p!==effectiveMe(t.key))||t.title;
     const av=isGroup?`<div class="avatar a56 group" style="background:${gradFor(t.title)}"><span>${esc(initials(t.title))}</span></div>`:`<div class="avatar a56" style="background:${gradFor(other)}"><span>${esc(initials(other))}</span></div>`;
@@ -542,7 +600,9 @@ function renderChatList(){
       <span class="badge">${t.messages.length>999?"999+":t.messages.length}</span>
     </div>`;
   }).join("");
+  $("#sbBody").insertAdjacentHTML("beforeend",hitsHTML);
   $$(".thread-row").forEach(r=>r.onclick=()=>selectThread(r.dataset.key));
+  $$(".hit").forEach(h=>h.onclick=()=>jumpTo(h.dataset.k,h.dataset.id));
 }
 
 function renderToolsPanel(){
@@ -552,7 +612,7 @@ function renderToolsPanel(){
   $("#sbBody").innerHTML=`
   <div class="card"><h4>🧠 วิเคราะห์${scope?" แชตนี้":"ทั้งหมด"}</h4><p>สถิติและคำที่พบบ่อย ประมวลผลในเครื่อง ไม่ใช้ AI</p><button class="pillbtn primary" id="btnAnalyze" style="width:100%">วิเคราะห์ตอนนี้</button></div>
   <div class="card"><h4>📅 Timeline</h4><p>จำนวนข้อความแยกตามเดือน</p><button class="pillbtn" id="btnTimeline" style="width:100%">เปิด Timeline</button></div>
-  <div class="card"><h4>⭐ บุ๊กมาร์ก (${bookmarks.size})</h4><p>ข้อความที่เก็บไว้ทั้งหมดทุกแชต</p><button class="pillbtn" id="btnExportBm" style="width:100%">ส่งออกเป็น TXT</button></div>
+  <div class="card"><h4>⭐ บุ๊กมาร์ก (${bookmarks.size})</h4><p>ข้อความที่เก็บไว้ทั้งหมดทุกแชต</p><div style="display:flex;gap:8px"><button class="pillbtn primary" id="btnViewBm" style="flex:1;justify-content:center">ดูรายการ</button><button class="pillbtn" id="btnExportBm" style="flex:1;justify-content:center">ส่งออก TXT</button></div></div>
   <div class="card"><h4>🏷️ แท็กของฉัน (${tagList.length})</h4><p>ตั้งชื่อแท็กเองได้อิสระที่ปุ่ม + ใต้ข้อความ แล้วกลับมากรองดูภายหลังได้</p>
     ${tagList.length?`<div>${tagList.map(tg=>`<span class="chip">${esc(tg)} · ${tagCounts.get(tg)}</span>`).join("")}</div><button class="pillbtn danger" id="btnClearTags" style="width:100%;margin-top:8px">ล้างแท็กทั้งหมด</button>`:`<p class="muted" style="margin:0">ยังไม่มีแท็ก</p>`}</div>
   <div class="card"><h4>📤 ส่งออกแชตนี้</h4><p>บันทึกบทสนทนาที่เปิดอยู่เป็นไฟล์ HTML อ่านได้แม้ไม่มีแอปนี้ (ข้อความล้วน ไม่รวมไฟล์สื่อ)</p><button class="pillbtn" id="btnExportHtml" style="width:100%" ${scope?"":"disabled"}>ส่งออกเป็น HTML</button></div>
@@ -561,6 +621,7 @@ function renderToolsPanel(){
   <div class="card"><h4>🔐 ความเป็นส่วนตัว</h4><p>อ่าน/แตกไฟล์ทั้งหมดในเบราว์เซอร์ของคุณ ไม่มีการส่งข้อความหรือรูปออกจากเครื่อง</p></div>`;
   $("#btnAnalyze").onclick=()=>analysisModal(scope);
   $("#btnTimeline").onclick=()=>timelineModal(scope);
+  $("#btnViewBm").onclick=bookmarksModal;
   $("#btnExportBm").onclick=exportBookmarks;
   const bh=$("#btnExportHtml"); if(bh) bh.onclick=()=>exportThreadHtml(scope);
   const bt=$("#btnClearTags"); if(bt) bt.onclick=()=>{ if(confirm("ล้างแท็กทั้งหมดทุกแชต?")){ tags.clear(); persistTags(); tagFilter=""; renderSidebar(); if(activeKey){renderFilters();renderMessages(true);} } };
@@ -617,11 +678,11 @@ function renderHeader(){
      <div class="name">${esc(t.title)}</div>
      <div class="sub">${isGroup?t.participants.length+" คน • ":""}${t.messages.length.toLocaleString()} ข้อความ</div>
    </div>
-   <button class="iconbtn" id="filterToggle" title="ตัวกรอง">⚙</button>
+   <button class="iconbtn" id="filterToggle" title="ค้นหา / ตัวกรอง">🔎</button>
    <button class="iconbtn" id="threadToolsBtn" title="เครื่องมือ">🧰</button>`;
   $("#backBtn").onclick=closeThread;
-  $("#filterToggle").onclick=()=>$("#filtersBar").classList.toggle("hidden");
-  $("#threadToolsBtn").onclick=()=>{ activeTab="tools"; setActiveTab(); };
+  $("#filterToggle").onclick=()=>{ const f=$("#filtersBar"); f.classList.toggle("hidden"); if(!f.classList.contains("hidden")){ const i=$("#msgSearch"); if(i)i.focus(); } };
+  $("#threadToolsBtn").onclick=()=>{ activeTab="tools"; setActiveTab(); closeThread(); };
 }
 function renderFilters(){
   const t=threads.find(x=>x.key===activeKey);
@@ -635,6 +696,7 @@ function renderFilters(){
    ${isGroup?`<select id="personSel"><option value="">ทุกคน</option>${t.participants.map(p=>`<option ${p===personFilter?"selected":""}>${esc(p)}</option>`).join("")}</select>`:""}
    <select id="kindSel"><option value="">ทุกชนิด</option><option value="text">ข้อความ</option><option value="media">มีสื่อ</option><option value="share">แชร์โพสต์/Reel</option><option value="reaction">มี reaction</option><option value="bookmark">บุ๊กมาร์ก</option></select>
    <input id="dateFromSel" type="date"><input id="dateToSel" type="date">
+   <label class="pillbtn" title="ไปที่วันที่">📅 ไปที่วัน<input id="gotoDate" type="date" style="width:0;height:0;opacity:0;position:absolute"></label>
    <button class="pillbtn" id="galleryBtn">🖼️ สื่อทั้งหมด</button>
    <button class="pillbtn" id="resetFilters">ล้างตัวกรอง</button>
    ${threadTags.length?`<div style="width:100%;margin-top:2px">${threadTags.map(tg=>`<span class="tag-chip-filter ${tagFilter===tg?"sel":""}" data-tagchip="${esc(tg)}">🏷️ ${esc(tg)}</span>`).join("")}</div>`:""}`;
@@ -644,6 +706,13 @@ function renderFilters(){
   $("#kindSel").onchange=e=>{ kindFilter=e.target.value; renderedCount=PAGE; renderMessages(true); };
   $("#dateFromSel").onchange=e=>{ dateFrom=e.target.value; renderedCount=PAGE; renderMessages(true); };
   $("#dateToSel").onchange=e=>{ dateTo=e.target.value; renderedCount=PAGE; renderMessages(true); };
+  $("#gotoDate").onchange=e=>{
+    if(!e.target.value)return;
+    const ts=new Date(e.target.value+"T00:00:00").getTime();
+    const m=t.messages.find(x=>x.timestamp_ms>=ts)||t.messages[t.messages.length-1];
+    if(m)jumpTo(t.key,m._id);
+  };
+  $("#gotoDate").parentElement.onclick=ev=>{ if(ev.target.id!=="gotoDate"){ try{ $("#gotoDate").showPicker(); }catch(e){ $("#gotoDate").click(); } } };
   $("#galleryBtn").onclick=()=>galleryModal(t);
   $("#resetFilters").onclick=()=>{ msgSearch="";kindFilter="";personFilter="";dateFrom="";dateTo="";tagFilter="";renderedCount=PAGE;renderFilters();renderMessages(true); };
   $$("[data-tagchip]").forEach(c=>c.onclick=()=>{ tagFilter = tagFilter===c.dataset.tagchip ? "" : c.dataset.tagchip; renderedCount=PAGE; renderFilters(); renderMessages(true); });
@@ -696,19 +765,34 @@ function ensureObserver(){
         hydrateThumb(el);
       }
     });
-  },{root:null,rootMargin:"600px"}); // root:null (viewport) works correctly for thumbs inside
-    // #messages AND inside the gallery modal's own scroll container (#modalBody) — a scoped
-    // root only works for descendants of that root, so the gallery grid never hydrated before.
+  },{root:null,rootMargin:"500px"});
   return io;
 }
 async function hydrateThumb(el){
   const uri=el.dataset.uri, mtype=el.dataset.mtype;
-  const url=await getMediaURL(uri);
+  const overlay=el.querySelector(".more")?el.querySelector(".more").outerHTML:"";
+  const idx=findMediaIdx(uri);
   el.classList.remove("skeleton");
-  if(!url){ el.innerHTML=`<div style="display:grid;place-items:center;height:100%;font-size:22px">${mtype==="video"?"🎬":"🖼️"}</div>`; return; }
-  if(mtype==="video"){ el.innerHTML=`<video src="${url}" muted preload="metadata"></video><div class="playicon">▶</div>`; }
-  else{ el.innerHTML=`<img src="${url}" loading="lazy" alt="">`; }
-  el.onclick=()=>openLightbox(url,mtype);
+  if(idx<0){
+    el.innerHTML=`<div class="missing" title="${esc(uri)}"><span>${mtype==="video"?"🎬":"🖼️"}</span><small>ไม่พบไฟล์</small></div>${overlay}`;
+    el.dataset.missing="1"; return;
+  }
+  const item=mediaItems[idx];
+  if(mtype==="video" && item.type==="zip" && !item.url){
+    // don't decompress big videos until tapped
+    el.innerHTML=`<div class="missing vid"><span>🎬</span><small>แตะเพื่อเล่น</small></div><div class="playicon">▶</div>${overlay}`;
+    el.onclick=async()=>{ el.classList.add("skeleton"); const u=await getMediaURL(uri); el.classList.remove("skeleton"); if(u)openLightbox(u,"video",el); };
+    return;
+  }
+  const url=await getMediaURL(uri);
+  if(!url){ el.innerHTML=`<div class="missing"><span>⚠️</span><small>เปิดไฟล์ไม่ได้</small></div>${overlay}`; return; }
+  if(mtype==="video"){ el.innerHTML=`<video src="${url}#t=0.1" muted preload="metadata" playsinline></video><div class="playicon">▶</div>${overlay}`; }
+  else{
+    el.innerHTML=`<img src="${url}" alt="" decoding="async">${overlay}`;
+    const img=el.querySelector("img");
+    img.onerror=()=>{ el.innerHTML=`<div class="missing"><span>🖼️</span><small>แสดงรูปนี้ไม่ได้ (เช่น HEIC)</small></div>${overlay}`; };
+  }
+  el.onclick=()=>openLightbox(url,mtype,el);
 }
 async function hydrateAudio(el){
   const uri=el.dataset.uri;
@@ -739,7 +823,7 @@ function shareHTML(m,mine){
   if(!m.share?.link)return "";
   return `<div class="share-card">
     <div class="sc-body">
-      <div class="sc-title">🔗 โพสต์ / Reel ที่แชร์</div>
+      <div class="sc-title">🔗 โพสต์ / Reel ที่แชร์${m.share.owner?` · @${esc(m.share.owner)}`:""}</div>
       ${m.share.share_text?`<div class="sc-text">${hi(m.share.share_text)}</div>`:""}
     </div>
     <a class="sc-link" href="${esc(m.share.link)}" target="_blank" rel="noopener">เปิดลิงก์ ↗</a>
@@ -750,6 +834,45 @@ function reactionsHTML(m){
   const counts=new Map();
   m.reactions.forEach(r=>{ const k=r.reaction||"👍"; if(!counts.has(k))counts.set(k,{n:0,actors:[]}); const o=counts.get(k); o.n++; o.actors.push(r.actor); });
   return `<div class="reactions">${[...counts.entries()].map(([e,o])=>`<span class="reaction-pill" title="${esc(o.actors.join(', '))}">${esc(e)} ${o.n>1?o.n:""}</span>`).join("")}</div>`;
+}
+
+const diagCache=new Map();
+function mediaDiag(t){
+  const ck=t.key+"|"+t.messages.length+"|"+mediaItems.length;
+  if(diagCache.has(ck))return diagCache.get(ck);
+  const uris=new Set();
+  t.messages.forEach(m=>{
+    (m.photos||[]).forEach(p=>p.uri&&uris.add(p.uri));
+    (m.videos||[]).forEach(v=>v.uri&&uris.add(v.uri));
+    (m.audio_files||[]).forEach(a=>a.uri&&uris.add(a.uri));
+    (m.gifs||[]).forEach(g=>g.uri&&uris.add(g.uri));
+    if(m.sticker?.uri)uris.add(m.sticker.uri);
+  });
+  let found=0; uris.forEach(u=>{ if(findMediaIdx(u)>=0)found++; });
+  const r={total:uris.size,found}; diagCache.set(ck,r); return r;
+}
+function snippet(m){
+  if(m.content)return m.content.length>110?m.content.slice(0,110)+"…":m.content;
+  if(m.share?.link)return "🔗 แชร์โพสต์/Reel";
+  if(m.photos?.length)return "📷 รูปภาพ"; if(m.videos?.length)return "🎬 วิดีโอ"; if(m.audio_files?.length)return "🎧 ข้อความเสียง";
+  return "…";
+}
+function jumpTo(key,id){
+  closeModal();
+  selectThread(key);
+  const t=threads.find(x=>x.key===key); if(!t)return;
+  const idx=t.messages.findIndex(m=>m._id===id); if(idx<0)return;
+  renderedCount=Math.max(PAGE,t.messages.length-idx+40);
+  renderMessages(true);
+  const el=[...$("#messages").querySelectorAll("[data-mid]")].find(e=>e.dataset.mid===id);
+  if(el){ el.scrollIntoView({block:"center"}); el.classList.add("flash"); setTimeout(()=>el.classList.remove("flash"),1800); }
+}
+function bookmarksModal(){
+  const list=threads.flatMap(t=>t.messages.filter(m=>bookmarks.has(m._id)).map(m=>({m,t})));
+  if(!list.length){ openModal("⭐ บุ๊กมาร์ก","ยังไม่มีบุ๊กมาร์ก — เอาเมาส์ชี้ข้อความแล้วกด ☆ (บนมือถือแตะที่ข้างบับเบิล)"); return; }
+  list.sort((a,b)=>b.m.timestamp_ms-a.m.timestamp_ms);
+  openModal(`⭐ บุ๊กมาร์ก (${list.length})`,list.map(({m,t})=>`<div class="bm-item" data-k="${esc(t.key)}" data-id="${esc(m._id)}"><div class="bm-meta">${esc(t.title)} · ${esc(m.sender_name)} · ${esc(new Date(m.timestamp_ms).toLocaleString("th-TH",{dateStyle:"medium",timeStyle:"short"}))}</div><div>${esc(snippet(m))}</div></div>`).join(""));
+  $$(".bm-item").forEach(e=>e.onclick=()=>jumpTo(e.dataset.k,e.dataset.id));
 }
 
 function renderMessages(resetScroll){
@@ -767,11 +890,20 @@ function renderMessages(resetScroll){
   const isGroup=t.participants.length>2;
   let html="", lastDay="", lastSender=null, lastTs=0;
 
+  const diag=mediaDiag(t);
+  if(diag.total>0 && diag.found===0){
+    html+=`<div class="msg-inner"><div class="notice">⚠️ แชตนี้อ้างอิงรูป/วิดีโอ/เสียง ${diag.total.toLocaleString()} ไฟล์ แต่ยังไม่พบไฟล์สื่อในข้อมูลที่นำเข้า — ถ้าตอน export แยกเป็นหลายไฟล์ ZIP ให้นำเข้าส่วนที่มีโฟลเดอร์ photos/videos ด้วย (เลือกได้หลายไฟล์พร้อมกัน) หรือเลือกเป็นโฟลเดอร์ทั้งชุด</div></div>`;
+  }else if(diag.total>0 && diag.found<diag.total){
+    html+=`<div class="msg-inner"><div class="notice">พบไฟล์สื่อ ${diag.found.toLocaleString()} จาก ${diag.total.toLocaleString()} ไฟล์ที่แชตนี้อ้างอิง (ที่เหลืออาจอยู่ใน ZIP ส่วนอื่นที่ยังไม่ได้นำเข้า)</div></div>`;
+  }
   if(arr.length>slice.length){
     html+=`<div class="loadmore-wrap"><button class="pillbtn" id="loadMoreBtn">โหลดข้อความเก่ากว่านี้ (${(arr.length-slice.length).toLocaleString()})</button></div>`;
   }
 
+  const animFrom=resetScroll?Math.max(0,slice.length-14):slice.length;
+  let sliceIdx=-1;
   for(const m of slice){
+    sliceIdx++;
     const d=fmtDay(m.timestamp_ms);
     if(d!==lastDay){ html+=`<div class="msg-inner"><div class="day-pill"><span>${esc(d)}</span></div></div>`; lastDay=d; lastSender=null; }
     const mine = m.sender_name===me;
@@ -779,15 +911,14 @@ function renderMessages(resetScroll){
     const bm=bookmarks.has(m._id);
     const other=m.sender_name;
 
-    // each message renders as its own self-contained row; sameGroup only controls
-    // whether the avatar/sender-label repeat, giving a grouped look via CSS spacing
     const showAvatar = !mine; // show avatar column for other person's messages
     const avatarHTML = (!sameGroup && showAvatar) ? `<div class="avatar a28" style="background:${gradFor(other)}"><span>${esc(initials(other))}</span></div>` : "";
     const gutter = showAvatar ? `<div class="gutter">${avatarHTML}</div>` : "";
     const nameLabel = (isGroup && !mine && !sameGroup) ? `<div class="sender-label">${esc(other)}</div>` : "";
 
     const bodyParts=[];
-    if(m.content) bodyParts.push(`<div>${hi(m.content)}</div>`);
+    if(m.is_unsent && !m.content) bodyParts.push(`<div class="unsent">ข้อความนี้ถูกยกเลิกการส่ง</div>`);
+    if(m.content) bodyParts.push(`<div>${msgHTML(m.content)}</div>`);
     const media=mediaGridHTML(m,mine); if(media) bodyParts.push(media);
     const aud=audioHTML(m); if(aud) bodyParts.push(aud);
     const sh=shareHTML(m,mine); if(sh) bodyParts.push(sh);
@@ -796,19 +927,22 @@ function renderMessages(resetScroll){
 
     const bareMedia = !m.content && (media||aud) && !sh;
     const msgTags=[...(tags.get(m._id)||[])];
-    const tagRow = msgTags.length ? `<div class="tag-row">${msgTags.map(tg=>`<span class="tag-pill">🏷️ ${esc(tg)}<span class="x" data-untag="${esc(m._id)}" data-tag="${esc(tg)}">✕</span></span>`).join("")}<button class="tag-add-btn" data-addtag="${esc(m._id)}" title="เพิ่มแท็ก">+</button></div>`
-      : `<div class="tag-row"><button class="tag-add-btn" data-addtag="${esc(m._id)}" title="เพิ่มแท็ก">🏷️+</button></div>`;
-    html+=`<div class="msg-inner"><div class="group ${mine?"mine":""}">
+    const tagRow = msgTags.length ? `<div class="tag-row">${msgTags.map(tg=>`<span class="tag-pill">🏷️ ${esc(tg)}<span class="x" data-untag="${esc(m._id)}" data-tag="${esc(tg)}">✕</span></span>`).join("")}</div>` : "";
+    html+=`<div class="msg-inner ${sliceIdx>=animFrom?"anim":""}" data-mid="${esc(m._id)}"><div class="group ${mine?"mine":""}">
       ${gutter}
       <div class="col">
         ${nameLabel}
         <div class="bubble-row">
-          <button class="star-btn ${bm?"on":""}" data-id="${esc(m._id)}">${bm?"⭐":"☆"}</button>
-          <div class="bubble ${bareMedia?"tight":""}">${bodyParts.join("")}</div>
+          <div class="bubble ${bareMedia?"tight":""} ${(m.content&&!media&&!aud&&!sh&&isEmojiOnly(m.content))?"emoji":""}">${bodyParts.join("")}</div>
+          <div class="hover-actions">
+            <button class="star-btn ${bm?"on":""}" data-id="${esc(m._id)}" title="บุ๊กมาร์ก">${bm?"⭐":"☆"}</button>
+            <button class="tag-add-btn" data-addtag="${esc(m._id)}" title="เพิ่มแท็ก">🏷️</button>
+            ${filtersActive()?`<button class="tag-add-btn" data-ctx="${esc(m._id)}" title="ดูข้อความรอบๆ">📍</button>`:""}
+            <span class="msg-time">${fmtTime(m.timestamp_ms)}</span>
+          </div>
         </div>
         ${reactionsHTML(m)}
         ${tagRow}
-        <div class="msg-time" style="align-self:${mine?"flex-end":"flex-start"}">${fmtTime(m.timestamp_ms)}</div>
       </div>
     </div></div>`;
     lastSender=m.sender_name; lastTs=m.timestamp_ms;
@@ -830,6 +964,7 @@ function renderMessages(resetScroll){
     const name=prompt("ตั้งชื่อแท็กสำหรับข้อความนี้ (เช่น สำคัญ, แผนเที่ยว, ทะเลาะ):");
     if(name&&name.trim()){ addTagToMsg(id,name.trim()); renderMessages(false); if(activeKey)renderFilters(); }
   });
+  $$("[data-ctx]").forEach(b=>b.onclick=()=>jumpTo(activeKey,b.dataset.ctx));
   $$("[data-untag]").forEach(b=>b.onclick=(e)=>{ e.stopPropagation(); removeTagFromMsg(b.dataset.untag,b.dataset.tag); renderMessages(false); if(activeKey)renderFilters(); });
   const lm=$("#loadMoreBtn");
   if(lm) lm.onclick=()=>{ renderedCount+=PAGE; renderMessages(false); };
@@ -839,13 +974,45 @@ function renderMessages(resetScroll){
 }
 
 /* ============ lightbox ============ */
-function openLightbox(url,type){
-  const lb=$("#lightbox");
-  lb.innerHTML=`<button class="lb-close" id="lbClose">✕</button><a class="lb-dl" href="${url}" download title="ดาวน์โหลด">⬇</a>${type==="video"?`<video src="${url}" controls autoplay></video>`:`<img src="${url}" alt="">`}`;
+let lbCtx={list:[],i:0};
+function closeLightbox(){ const lb=$("#lightbox"); lb.classList.add("hidden"); lb.innerHTML=""; }
+function showLb(){
+  const lb=$("#lightbox"); const cur=lbCtx.list[lbCtx.i]; if(!cur)return;
+  const multi=lbCtx.list.length>1;
+  lb.innerHTML=`<button class="lb-close" id="lbClose">✕</button><a class="lb-dl" href="${cur.url}" download title="ดาวน์โหลด">⬇</a>${multi?`<button class="lb-nav prev" id="lbPrev">‹</button><button class="lb-nav next" id="lbNext">›</button>`:""}${cur.type==="video"?`<video src="${cur.url}" controls autoplay playsinline></video>`:`<img src="${cur.url}" alt="">`}`;
   lb.classList.remove("hidden");
-  $("#lbClose").onclick=()=>lb.classList.add("hidden");
-  lb.onclick=e=>{ if(e.target.id==="lightbox")lb.classList.add("hidden"); };
+  $("#lbClose").onclick=closeLightbox;
+  if(multi){ $("#lbPrev").onclick=()=>stepLb(-1); $("#lbNext").onclick=()=>stepLb(1); }
+  lb.onclick=e=>{ if(e.target.id==="lightbox")closeLightbox(); };
 }
+async function stepLb(d){
+  const n=lbCtx.list.length; if(!n)return;
+  for(let k=0;k<n;k++){
+    lbCtx.i=(lbCtx.i+d+n)%n;
+    const it=lbCtx.list[lbCtx.i];
+    if(!it.url) it.url=await getMediaURL(it.uri);
+    if(it.url){ showLb(); return; }
+  }
+}
+function openLightbox(url,type,el){
+  const container=el?el.closest("#modalBody")||$("#messages"):null;
+  let list=[],i=0;
+  if(container){
+    const thumbs=[...container.querySelectorAll(".mthumb:not([data-missing])")];
+    list=thumbs.map(t=>({uri:t.dataset.uri,type:t.dataset.mtype,url:null}));
+    i=Math.max(0,thumbs.indexOf(el));
+    if(list[i])list[i].url=url;
+  }
+  if(!list.length){ list=[{uri:"",type,url}]; i=0; }
+  lbCtx={list,i};
+  showLb();
+}
+document.addEventListener("keydown",e=>{
+  const lbOpen=!$("#lightbox").classList.contains("hidden");
+  if(e.key==="Escape"){ if(lbOpen)closeLightbox(); else closeModal(); }
+  else if(lbOpen && e.key==="ArrowLeft")stepLb(-1);
+  else if(lbOpen && e.key==="ArrowRight")stepLb(1);
+});
 
 /* ============ modal / analysis / timeline / export ============ */
 function openModal(title,body){ $("#modalTitle").textContent=title; $("#modalBody").innerHTML=body; $("#modal").classList.remove("hidden"); }
@@ -897,14 +1064,15 @@ function setActiveTab(){
 $("#tabChats").onclick=()=>{ activeTab="chats"; setActiveTab(); };
 $("#tabTools").onclick=()=>{ activeTab="tools"; setActiveTab(); };
 $("#tabImport").onclick=()=>{ activeTab="import"; setActiveTab(); };
-$("#threadSearch").oninput=e=>{ threadSearch=e.target.value; if(activeTab!=="chats"){activeTab="chats";setActiveTab();}else renderChatList(); };
+let tsTimer=null;
+$("#threadSearch").oninput=e=>{ threadSearch=e.target.value; clearTimeout(tsTimer); tsTimer=setTimeout(()=>{ if(activeTab!=="chats"){activeTab="chats";setActiveTab();}else renderChatList(); },180); };
 $("#themeBtn").onclick=()=>{ document.body.classList.toggle("dark"); try{localStorage.setItem("car-theme",document.body.classList.contains("dark")?"dark":"light")}catch(e){} $("#themeBtn").textContent=document.body.classList.contains("dark")?"☀":"☾"; };
 $("#helpBtn").onclick=()=>openModal("❓ วิธีใช้",`<ol style="padding-left:18px;line-height:1.8">
  <li>กดแท็บ <b>➕ นำเข้า</b> แล้วเลือกไฟล์ ZIP ที่ดาวน์โหลดจาก Instagram/Facebook (แนะนำ เพราะดึงรูป/วิดีโอ/เสียงมาแสดงในแชตได้ด้วย)</li>
  <li>หรือแตก ZIP เองก่อน แล้วเลือก “โฟลเดอร์ที่แตกแล้ว” ทั้งโฟลเดอร์ (รวมรูป/วิดีโอ) ระบบจะจับคู่สื่อกับข้อความให้อัตโนมัติ</li>
  <li>เลือกไฟล์ JSON เดี่ยวๆ ได้เช่นกัน แต่จะไม่มีรูป/วิดีโอประกอบ</li>
  <li>แชตแต่ละอันจะถูกจัดกลุ่มให้อัตโนมัติเหมือนหน้าแชต แตะเพื่อเปิดอ่าน</li>
- <li>ใช้ ⚙ ในหน้าแชตเพื่อค้นหา/กรองตามช่วงเวลาหรือชนิดข้อความ กด ☆ เพื่อบุ๊กมาร์กข้อความสำคัญ</li>
+ <li>ใช้ 🔎 ในหน้าแชตเพื่อค้นหา/กรองตามช่วงเวลาหรือชนิดข้อความ กด ☆ เพื่อบุ๊กมาร์กข้อความสำคัญ</li>
  <li>ถ้าฝั่งข้อความของ “ฉัน” สลับผิดฝั่ง ไปที่แท็บ 🧰 เครื่องมือ แล้วเลือกใหม่ในหัวข้อ “สลับฝั่ง”</li>
  <li>ถ้ารูป/วิดีโอบางอันโชว์เป็นไอคอนแทน หมายความว่าไฟล์นั้นไม่ได้อยู่ใน ZIP/โฟลเดอร์ที่นำเข้า (Facebook/Instagram บางครั้งไม่แนบสื่อทุกไฟล์มาให้ครบ) ลองนำเข้าไฟล์ ZIP ส่วนถัดไปเพิ่มเพื่อเติมสื่อที่ขาด</li>
 </ol>
@@ -912,21 +1080,26 @@ $("#helpBtn").onclick=()=>openModal("❓ วิธีใช้",`<ol style="padd
 $("#modalClose").onclick=closeModal;
 $("#modal").onclick=e=>{ if(e.target.id==="modal")closeModal(); };
 
+let loadingOlder=false;
 $("#messages").addEventListener("scroll",()=>{
   const box=$("#messages");
-  if(box.scrollTop<80){
-    const t=threads.find(x=>x.key===activeKey);
-    if(t){ const arr=filteredActive(); if(arr.length>renderedCount){ /* handled via button to avoid jank-loops; keep manual */ } }
+  const nearBottom=box.scrollHeight-box.scrollTop-box.clientHeight<300;
+  $("#jumpBottom").classList.toggle("hidden",nearBottom);
+  if(box.scrollTop<60 && !loadingOlder && activeKey && $("#loadMoreBtn")){
+    loadingOlder=true; renderedCount+=PAGE; renderMessages(false);
+    setTimeout(()=>{loadingOlder=false},250);
   }
 });
+$("#jumpBottom").onclick=()=>{ const b=$("#messages"); b.scrollTo({top:b.scrollHeight,behavior:"smooth"}); };
 
 /* drag & drop zip anywhere */
 ["dragover","drop"].forEach(ev=>window.addEventListener(ev,e=>e.preventDefault()));
 window.addEventListener("drop",e=>{
   const f=[...(e.dataTransfer?.files||[])];
   if(!f.length)return;
-  if(f.length===1 && /\.zip$/i.test(f[0].name)){ activeTab="import"; setActiveTab(); loadZip(f[0]); }
-  else{ activeTab="import"; setActiveTab(); loadFileList(f); }
+  const zips=f.filter(x=>/\.zip$/i.test(x.name));
+  activeTab="import"; setActiveTab();
+  if(zips.length) loadZips(zips); else loadFileList(f);
 });
 
 /* init */
